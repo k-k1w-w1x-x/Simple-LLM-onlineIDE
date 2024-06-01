@@ -17,7 +17,7 @@
 import fileMenu from "./components/fileMenu.vue";
 import monacoEditor from "./components/monacoEditor.vue";
 import myIframe from "./components/iframe.vue";
-import vueTerminal from "./components/terminal.vue";
+import vueTerminal from "./components/terminal/index.vue";
 </script>
 
 <style lang="less" scoped>

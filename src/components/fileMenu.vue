@@ -16,16 +16,27 @@
       ref="treeRef"
       :data="dataSource"
       highlight-current
-      :indent="4"
       node-key="id"
       @node-click="nodeClick"
       @click.self="cancelChecked"
     >
       <template #default="{ node, data }">
         <!-- 这里需要实现新建文件的输入框 -->
-        <template v-if="data.isNew"> </template>
+        <template v-if="data.isNew">
+          <el-input
+            ref="newFileRef"
+            @blur="confirm"
+            @keydown.enter="newFileEnter"
+            v-model="newFileName"
+            :prefix-icon="data.isFolder ? FolderOpened : Document"
+            size="small"
+            :placeholder="
+              data.isFolder ? 'Input Folder Name...' : 'Input File Name...'
+            "
+          />
+        </template>
         <template v-else>
-          <img v-if="data.icon" :src="data.icon" alt="" />
+          <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
           {{ node.label }}
         </template>
       </template>
@@ -35,13 +46,19 @@
 
 <script setup lang="ts">
 import { useFileMenu } from "../hooks/useFileMenu";
+import { Document, FolderOpened } from "@element-plus/icons-vue";
+
 const {
+  newFileRef,
+  newFileName,
   icons,
   treeRef,
   dataSource,
   iconClick,
   nodeClick,
   cancelChecked,
+  confirm,
+  newFileEnter,
 } = useFileMenu();
 </script>
 
@@ -49,7 +66,7 @@ const {
 .file-menu {
   width: 220px;
   border-right: solid #ccc 1px;
-  padding: 10px 0;
+  padding: 10px;
   &-icons {
     box-sizing: content-box;
     height: 24px;

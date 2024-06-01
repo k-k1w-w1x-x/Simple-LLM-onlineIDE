@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "element-plus": "^2.7.4",
     "less": "^4.2.0",
     "less-loader": "4",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "vue-web-terminal": "3"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",

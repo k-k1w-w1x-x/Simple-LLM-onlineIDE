@@ -19,7 +19,6 @@ export interface ITreeDataIsNew {
   isFolder: boolean;
 }
 
-export type ITreeData = ITreeDataFile[] | ITreeDataFolder[] | ITreeDataIsNew[];
-
+export type ITreeData = (ITreeDataFile | ITreeDataFolder | ITreeDataIsNew)[];
 // Element Plus Tree 回调参数
 export type ITree = ITreeDataFile | ITreeDataFolder | ITreeDataIsNew;

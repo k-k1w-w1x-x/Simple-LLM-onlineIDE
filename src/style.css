@@ -8,3 +8,6 @@
 .el-tree-node__content img {
   height: 100%;
 }
+.el-tree-node__content i.is-leaf {
+  display: none;
+}
