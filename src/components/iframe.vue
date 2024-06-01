@@ -2,7 +2,10 @@
   <div class="iframe">iframe</div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { webcontainer } from "../container";
+
+</script>
 
 <style lang="less" scoped>
 .iframe {

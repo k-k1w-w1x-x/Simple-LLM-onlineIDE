@@ -8,6 +8,12 @@ dependencies:
   '@element-plus/icons-vue':
     specifier: ^2.3.1
     version: 2.3.1(vue@3.4.27)
+  '@types/node':
+    specifier: ^20.13.0
+    version: 20.13.0
+  '@webcontainer/api':
+    specifier: ^1.1.9
+    version: 1.1.9
   element-plus:
     specifier: ^2.7.4
     version: 2.7.4(vue@3.4.27)
@@ -48,7 +54,7 @@ devDependencies:
     version: 7.11.0(eslint@9.4.0)(typescript@5.4.5)
   vite:
     specifier: ^5.2.0
-    version: 5.2.12(less@4.2.0)
+    version: 5.2.12(@types/node@20.13.0)(less@4.2.0)
   vue-tsc:
     specifier: ^2.0.6
     version: 2.0.19(typescript@5.4.5)
@@ -548,6 +554,11 @@ packages:
     resolution: {integrity: sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==}
     dev: false
 
+  /@types/node@20.13.0:
+    resolution: {integrity: sha512-FM6AOb3khNkNIXPnHFDYaHerSv8uN22C91z098AnGccVu+Pcdhi+pNUFDi0iLmPIsVE0JBD0KVS7mzUYt4nRzQ==}
+    dependencies:
+      undici-types: 5.26.5
+
   /@types/web-bluetooth@0.0.16:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
     dev: false
@@ -686,7 +697,7 @@ packages:
       vite: ^5.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 5.2.12(less@4.2.0)
+      vite: 5.2.12(@types/node@20.13.0)(less@4.2.0)
       vue: 3.4.27(typescript@5.4.5)
     dev: true
 
@@ -941,6 +952,10 @@ packages:
       '@webassemblyjs/ast': 1.9.0
       '@webassemblyjs/wast-parser': 1.9.0
       '@xtuc/long': 4.2.2
+    dev: false
+
+  /@webcontainer/api@1.1.9:
+    resolution: {integrity: sha512-Sp6PV0K9D/3f8fSbCubqhfmBFH8XbngZCBOCF+aExyGqnz2etmw+KYvbQ/JxYvYX5KPaSxM+asFQwoP2RHl5cg==}
     dev: false
 
   /@xtuc/ieee754@1.2.0:
@@ -3888,6 +3903,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  /undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   /union-value@1.0.1:
     resolution: {integrity: sha512-tJfXmxMeWYnczCVs7XAEvIV7ieppALdyepWMkHkwciRpZraG/xwT+s2JN8+pr1+8jCRf80FFzvr+MpQeeoF4Xg==}
     engines: {node: '>=0.10.0'}
@@ -3962,7 +3980,7 @@ packages:
       inherits: 2.0.3
     dev: false
 
-  /vite@5.2.12(less@4.2.0):
+  /vite@5.2.12(@types/node@20.13.0)(less@4.2.0):
     resolution: {integrity: sha512-/gC8GxzxMK5ntBwb48pR32GGhENnjtY30G4A0jemunsBkiEZFw60s8InGpN8gkhHEkjnRK1aSAxeQgwvFhUHAA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -3990,6 +4008,7 @@ packages:
       terser:
         optional: true
     dependencies:
+      '@types/node': 20.13.0
       esbuild: 0.20.2
       less: 4.2.0
       postcss: 8.4.38
