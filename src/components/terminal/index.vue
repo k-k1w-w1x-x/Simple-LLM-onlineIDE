@@ -8,10 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+// import { reactive, ref } from "vue";
 import terminal from "./components/vue-web-terminal.vue";
-const activeTerminal = ref("terminal1");
-const terminalList = reactive(["terminal1", "terminal2"]);
+// const activeTerminal = ref("terminal1");
+// const terminalList = reactive(["terminal1", "terminal2"]);
 </script>
 
 <style lang="less" scoped>
