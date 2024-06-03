@@ -3,15 +3,14 @@
     <div class="terminal-tabs">
       <span class="active">Term 1</span>
     </div>
-    <terminal name="terminal1" />
+    <div class="terminal-list">
+      <terminal name="terminal1" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// import { reactive, ref } from "vue";
 import terminal from "./components/vue-web-terminal.vue";
-// const activeTerminal = ref("terminal1");
-// const terminalList = reactive(["terminal1", "terminal2"]);
 </script>
 
 <style lang="less" scoped>
@@ -28,6 +27,9 @@ import terminal from "./components/vue-web-terminal.vue";
       font-size: 12px;
       margin: 0 8px;
     }
+  }
+  &-list{
+    padding-bottom: 10px;
   }
 }
 .active {

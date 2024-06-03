@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Observable class prototype.
  *
@@ -25,8 +26,6 @@ export class Observable {
   once(name: string, f: voidFun) {
     const _f = (...args: any[]) => {
       this.off(name, _f);
-      // eslint-disable-next-line
-      //@ts-ignore
       f(...args);
     };
     this.on(name, _f);
@@ -45,7 +44,7 @@ export class Observable {
   emit(name: string, args?: any) {
     return Array.from(
       (this._observers.get(name) || new Map()).values()
-      //@ts-ignore
+      // @ts-ignore
     ).forEach((f) => (args ? f(...args) : f()));
   }
 
@@ -53,3 +52,5 @@ export class Observable {
     this._observers = new Map();
   }
 }
+
+/* eslint-enable */
