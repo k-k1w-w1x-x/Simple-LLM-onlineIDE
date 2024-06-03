@@ -1,8 +1,9 @@
 // Web Container 共享文件，因为 fileTree Container对象需要在其他文件中共享
 import { WebContainer, WebContainerProcess } from "@webcontainer/api";
-import { tryCatch } from "../utils";
+import { getFileIcon, sortFile, tryCatch } from "../utils";
 import { defineStore } from "pinia";
 import { TFileTree, voidFun } from "../type";
+import { ITreeData } from "../type/fileMenu";
 
 // 第一个参数是应用程序中商店的唯一 id
 export const useContainerStore = defineStore("container", {
@@ -73,6 +74,62 @@ export const useContainerStore = defineStore("container", {
       this.container.on("server-ready", (_port: number, url: string) => {
         this.url = url;
       });
+    },
+
+    /**
+     * Web Container 的文件操作
+     *  1. 读取文件内容 - monaco用
+     *  2. 写入文件内容 - monaco 用
+     *  3. 删除文件/文件夹
+     *  4. 新建文件/文件夹 mkdir
+     *  5. 读取目录 - 转成tree datasuorce
+     */
+    readFile() {},
+    writeFile() {},
+    deleteFile() {},
+    async getDirectory() {
+      // 辅助函数 -  递归获取目录下的文件
+      const getFileTree = async (
+        root: string
+      ): Promise<ITreeData | undefined> => {
+        let result = [];
+
+        if (!this.container) return;
+
+        const files = await this.container.fs.readdir(root, {
+          withFileTypes: true,
+        });
+
+        for (let i = 0; i < files.length; i++) {
+          const item = files[i];
+
+          if (item.isDirectory()) {
+            // let _r =
+            result.push({
+              id: item.name,
+              label: item.name,
+              isFolder: true,
+              children: await getFileTree(`${root}/${item.name}`),
+            });
+          } else {
+            const name = item.name.split(".");
+            const suffix = name[name.length - 1];
+            result.push({
+              id: item.name,
+              label: item.name,
+              suffix,
+              isFolder: false,
+              icon: getFileIcon(suffix),
+            });
+          }
+        }
+
+        // eslint-disable-next-line
+        // @ts-ignore
+        return result;
+      };
+      const fileMenu = await getFileTree("/") as ITreeData;
+      return sortFile(fileMenu);
     },
   },
 });

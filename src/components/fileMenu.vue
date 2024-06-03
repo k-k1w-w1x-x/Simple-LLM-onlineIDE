@@ -9,6 +9,13 @@
         class="iconfont"
         :class="i"
       />
+      <i class="iconfont icon-gengduo">
+        <div class="more">
+          <span @click="initVue">init Vue</span>
+          <span>Time line</span>
+          <span>npm script</span>
+        </div>
+      </i>
     </div>
 
     <!-- 文件树 -->
@@ -59,6 +66,7 @@ const {
   cancelChecked,
   confirm,
   newFileEnter,
+  initVue,
 } = useFileMenu();
 </script>
 
@@ -68,6 +76,7 @@ const {
   border-right: solid #ccc 1px;
   padding: 10px;
   &-icons {
+    position: relative;
     box-sizing: content-box;
     height: 24px;
     display: flex;
@@ -95,5 +104,30 @@ const {
 .el-tree {
   user-select: none;
   height: calc(100% - 20px - 35px);
+}
+
+.more {
+  background-color: #fff;
+  border: solid rgba(204, 204, 204, 0.4) 1px;
+  z-index: 999;
+  position: absolute;
+  right: 0;
+  top: 25px;
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  display: none;
+  flex-direction: column;
+  span {
+    margin: 4px 0;
+    padding: 4px 8px;
+    cursor: pointer;
+    &:hover {
+      background-color: #ccc;
+    }
+  }
+}
+
+.icon-gengduo:hover .more {
+  display: flex !important;
 }
 </style>

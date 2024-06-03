@@ -10,7 +10,11 @@ import { getFileIcon } from "../utils";
 import type { ElTree } from "element-plus";
 import { voidFun } from "../type";
 // useFileMenu
+import { mock } from "../mock";
+import { useContainerStore } from "../pinia/useContainer";
 export const useFileMenu = () => {
+  const containerStore = useContainerStore();
+
   // 定义树节点 Ref -  InstanceType 处理 ElTree 页面dom 问题
   const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 
@@ -28,7 +32,6 @@ export const useFileMenu = () => {
     "icon-xinjianwenjian",
     "icon-xinjianwenjianjia",
     "icon-zidongliuchengxiafaliebiao",
-    "icon-gengduo",
   ];
 
   // data tree 数据源
@@ -165,6 +168,20 @@ export const useFileMenu = () => {
     }
   }
 
+  /**
+   * 初始化 Vue 项目
+   *  1. 将 mock 数据源处理后赋值给 dataSource
+   *  2. 挂载 filetree
+   */
+  async function initVue() {
+    const data = JSON.parse(JSON.stringify(mock.vueProject));
+    containerStore.setFileTree(data);
+    // 解析当前data 转成数组
+    const list = await containerStore.getDirectory();
+    dataSource.length = 0;
+    dataSource.push(...list);
+  }
+
   return {
     newFileRef,
     newFileName,
@@ -177,5 +194,6 @@ export const useFileMenu = () => {
     cancelChecked,
     confirm,
     newFileEnter,
+    initVue,
   };
 };
