@@ -32,33 +32,7 @@ export const useFileMenu = () => {
   ];
 
   // data tree 数据源
-  const dataSource = reactive<ITreeData>([
-    {
-      id: "1",
-      label: "src",
-      isFolder: true,
-      children: [
-        {
-          id: "2",
-          icon: getFileIcon("html"),
-          suffix: "html",
-          label: "index.html",
-        },
-        {
-          id: "3",
-          icon: getFileIcon("js"),
-          suffix: "html",
-          label: "index.js",
-        },
-        {
-          id: "4",
-          icon: getFileIcon("css"),
-          suffix: "html",
-          label: "index.css",
-        },
-      ],
-    },
-  ]);
+  const dataSource = reactive<ITreeData>([]);
 
   // filemenu icon click
   function iconClick(d: number) {
