@@ -58,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from "vue";
 import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
 
@@ -74,6 +75,15 @@ const {
   newFileEnter,
   initVueProject,
 } = useFileMenu();
+import { useContainerStore } from "../../pinia/useContainer";
+const containerStore = useContainerStore();
+
+// demo
+watch(
+  () => containerStore.boot,
+  () => initVueProject(),
+  { immediate: false }
+);
 </script>
 
 <style lang="less" scoped>

@@ -13,8 +13,11 @@
 
     <!-- loading -->
     <div class="loading" v-if="!containerStore.boot">
-      <div class="loader"></div>
-      <span>{{ message }}</span>
+      <div class="loader" v-if="!bootedFalse"></div>
+      <span :class="{ error: bootedFalse }">
+        <span v-if="bootedFalse">⛔</span>
+        {{ message }}
+      </span>
     </div>
   </div>
 </template>
@@ -28,10 +31,15 @@ import { useContainerStore } from "./pinia/useContainer";
 import { ref } from "vue";
 const containerStore = useContainerStore();
 let message = ref("Wait for the web container to boot...");
+const bootedFalse = ref(false);
 // 1. 执行boot 操作
 containerStore.bootContainer();
+// 2. 10s后，如果containerStore.boot 仍为false，则提示失败
 const timer = setTimeout(() => {
-  if (!containerStore.boot) message.value = "Faid to boot,Reload to try again.";
+  if (!containerStore.boot) {
+    message.value = "Faid to boot,Reload to try again.";
+    bootedFalse.value = true;
+  }
   clearTimeout(timer);
 }, 10000);
 </script>
@@ -73,5 +81,8 @@ const timer = setTimeout(() => {
   span {
     margin-left: 10px;
   }
+}
+.error {
+  color: #f56c6c;
 }
 </style>

@@ -4,7 +4,6 @@ import { getFileIcon, sortFile, tryCatch } from "../utils";
 import { defineStore } from "pinia";
 import { TFileTree, voidFun } from "../type";
 import { ITreeData } from "../type/fileMenu";
-
 // 第一个参数是应用程序中商店的唯一 id
 export const useContainerStore = defineStore("container", {
   state: () => {
@@ -90,7 +89,9 @@ export const useContainerStore = defineStore("container", {
      *  4. 新建文件/文件夹
      *  5. 读取目录 - 转成tree datasuorce
      */
-    async readFile() {},
+    async readFile(path: string) {
+      return await this.container?.fs.readFile(path, "utf8");
+    },
     async writeFile(
       path: string,
       data: string | Uint8Array,

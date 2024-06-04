@@ -5,16 +5,18 @@ import {
   ITreeDataIsNew,
   ITreeDataFolder,
   TFullData,
+  ITreeDataFile,
 } from "../type/fileMenu";
 import { getFullPath, getFileIcon, tryCatch } from "../utils";
 import type { ElTree } from "element-plus";
 import { voidFun } from "../type";
 import { mock } from "../mock";
 import { useContainerStore } from "../pinia/useContainer";
+import { useMonacoStore } from "../pinia/useMonaco";
 
 export const useFileMenu = () => {
   const containerStore = useContainerStore();
-
+  const monacoStore = useMonacoStore();
   // 定义树节点 Ref -  InstanceType 处理 ElTree 页面dom 问题
   const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 
@@ -137,6 +139,20 @@ export const useFileMenu = () => {
     removeNewItem(dataSource);
     newFileName.value = "";
     currentNodeKey.value = data.id;
+    if (!data.isFolder) {
+      monacoStore.setCurrentFile(data as ITreeDataFile);
+      readFile(data);
+    }
+  }
+
+  // 进行文件操作 - 获取文件内容赋值给 monaco editor
+  async function readFile(data: ITree) {
+    // 1. 通过ID 查找完整路径
+    const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
+    let fullpath = <string[]>getFullPath(dataMap, data.id);
+    const path = "/" + fullpath.join("/");
+    const contents = await containerStore.readFile(path);
+    monacoStore.setValue(contents as string, (data as ITreeDataFile).suffix);
   }
 
   /**
