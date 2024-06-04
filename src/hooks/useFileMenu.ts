@@ -4,14 +4,14 @@ import {
   ITree,
   ITreeDataIsNew,
   ITreeDataFolder,
-  ITreeDataFile,
+  TFullData,
 } from "../type/fileMenu";
-import { getFileIcon } from "../utils";
+import { getFullPath, getFileIcon, tryCatch } from "../utils";
 import type { ElTree } from "element-plus";
 import { voidFun } from "../type";
-// useFileMenu
 import { mock } from "../mock";
 import { useContainerStore } from "../pinia/useContainer";
+
 export const useFileMenu = () => {
   const containerStore = useContainerStore();
 
@@ -43,7 +43,13 @@ export const useFileMenu = () => {
     removeNewItem();
     newFileName.value = "";
     // 通过下标识别事件
-    const event: { [k: number]: voidFun } = [newFile, newFolder, collapseAll];
+    const event: { [k: number]: voidFun } = [
+      newFile,
+      newFolder,
+      collapseAll,
+      deleteNode,
+      renameItem,
+    ];
     event[d] && event[d]();
   }
 
@@ -82,10 +88,12 @@ export const useFileMenu = () => {
     const list = data || dataSource;
     list.forEach((item, index) => {
       if (Object.hasOwn(item, "isNew")) {
-        delete list[index];
+        list.splice(index, 1);
       }
       if (Object.hasOwn(item, "children"))
-        removeNewItem((item as ITreeDataFolder).children);
+        removeNewItem(
+          (item as ITreeDataFolder).children as unknown as ITreeData
+        );
     });
   }
   // 新建文件
@@ -111,6 +119,10 @@ export const useFileMenu = () => {
     const currentNode = treeRef.value?.getNode(currentNodeKey.value);
     currentNode?.expand();
   }
+  // 删除文件/文件夹
+  function deleteNode() {}
+  // 重命名
+  function renameItem() {}
 
   /**
    * 节点点击回调 - 通过该参数实现识别当前的目录层级
@@ -143,29 +155,63 @@ export const useFileMenu = () => {
   function confirm() {
     removeNewItem(dataSource);
     if (!newFileName.value) return;
-    // 不然，就根据当前位置，push 真实的数据到dataTree中，通过 newFileFlag.value 识别是文件还是文件夹
-    const fileSuffix = newFileName.value.split(".")[1];
-    const data: ITreeDataFile | ITreeDataFolder = {
-      id: `${new Date().getTime()}`,
-      label: newFileName.value,
-      isFolder: !newFileFlag.value,
-      children: [],
-      icon: newFileFlag.value ? getFileIcon(fileSuffix) : "",
-    };
-    if (currentNodeKey.value) {
-      // 如果有节点被选中，则看是文件，还是文件夹，是文件-在父级添加，是文件夹-直接在当前添加
-      const currentNode = treeRef.value?.getNode(currentNodeKey.value);
-      if (currentNode?.data.isFolder) {
-        // 如果是文件夹，则在当前节点下添加
-        treeRef.value?.append(data, currentNodeKey.value);
-      } else {
-        // 如果是文件，则在 Tree 中给定节点后插入一个节点
-        treeRef.value?.insertAfter(data, currentNodeKey.value);
+    tryCatch(() => {
+      // 不然，就根据当前位置，push 真实的数据到dataTree中，通过 newFileFlag.value 识别是文件还是文件夹
+      const fileSuffix = newFileName.value.split(".")[1];
+      // 定义数据
+      const data = {
+        id: `${new Date().getTime()}`,
+        label: newFileName.value,
+        isFolder: !newFileFlag.value,
+        children: [],
+        icon: newFileFlag.value ? getFileIcon(fileSuffix) : "",
+      };
+      if (currentNodeKey.value) {
+        /**
+         * 如果有节点被选中，则看是文件，还是文件夹，是文件-在父级添加，是文件夹-直接在当前添加
+         * 如果是文件夹，则在当前节点下添加
+         * 如果是文件，则在 Tree 中选中节点后插入一个节点
+         */
+        const currentNode = treeRef.value?.getNode(currentNodeKey.value);
+        currentNode?.data.isFolder
+          ? treeRef.value?.append(data, currentNodeKey.value)
+          : treeRef.value?.insertAfter(data, currentNodeKey.value);
       }
-    } else {
       // 如果没有节点被选中，则直接添加到根目录
-      dataSource.push(data);
-    }
+      else dataSource.push(data);
+    });
+    // 将文件/文件夹添加到container文件系统中
+    mountedFileSystemTree();
+  }
+
+  /**
+   *  将新建的文件/文件夹挂载到Web Container File System Tree 中
+   */
+  function mountedFileSystemTree() {
+    tryCatch(async () => {
+      let path = "/";
+      // 如果有选中节点，则需要处理选中节点的路径问题
+      if (currentNodeKey.value) {
+        // 需要在这里加上父级 - 这里还需要判断激活的是文件还是文件夹
+        const currentNode = treeRef.value?.getNode(currentNodeKey.value); // 当前激活节点
+        const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
+        let fullpath = getFullPath(dataMap, currentNodeKey.value);
+        if (currentNode?.data.isFolder) path += fullpath?.join("/");
+        else {
+          // 删除最后一项
+          fullpath = fullpath?.slice(0, -1);
+          path += fullpath?.join("/");
+        }
+        path += "/";
+      }
+      // 如果没有选中节点，则直接拼接文件名称，放置到根路径下即可
+      // 例如 /vite.config.js
+      path += newFileName.value;
+      console.log("### path ==> ", path);
+      newFileFlag.value
+        ? containerStore.addFile(path)
+        : containerStore.addFolder(path);
+    });
   }
 
   /**
@@ -173,7 +219,7 @@ export const useFileMenu = () => {
    *  1. 将 mock 数据源处理后赋值给 dataSource
    *  2. 挂载 filetree
    */
-  async function initVue() {
+  async function initVueProject() {
     const data = JSON.parse(JSON.stringify(mock.vueProject));
     containerStore.setFileTree(data);
     // 解析当前data 转成数组
@@ -194,6 +240,6 @@ export const useFileMenu = () => {
     cancelChecked,
     confirm,
     newFileEnter,
-    initVue,
+    initVueProject,
   };
 };

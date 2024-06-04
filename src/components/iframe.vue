@@ -1,21 +1,12 @@
 <template>
   <div class="iframe">
     <iframe :src="containerStore.url" v-if="containerStore.url" />
-
-    <div class="loader-box" v-else>
-      <div class="loader"></div>
-      <span v-if="!containerStore.boot">{{ "web container boot..." }}</span>
-      <span v-else-if="!containerStore.install">{{ "npm install..." }}</span>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useContainerStore } from "../pinia/useContainer";
 const containerStore = useContainerStore();
-
-// 1. 执行boot 操作
-containerStore.bootContainer();
 </script>
 
 <style lang="less" scoped>

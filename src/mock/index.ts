@@ -1,7 +1,6 @@
 // 导出 文件结构的 mock 结构
 
 import { TFileTree } from "../type";
-import { getFileIcon } from "../utils";
 
 /**
  * Vue 项目

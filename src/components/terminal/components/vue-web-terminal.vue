@@ -4,6 +4,7 @@
     context="Root"
     @exec-cmd="command"
     :show-header="false"
+    :auto-help="false"
     :init-log="null"
   />
 </template>

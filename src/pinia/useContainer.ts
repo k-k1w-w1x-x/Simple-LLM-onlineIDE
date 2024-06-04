@@ -9,16 +9,19 @@ import { ITreeData } from "../type/fileMenu";
 export const useContainerStore = defineStore("container", {
   state: () => {
     return {
-      fileTree: <TFileTree>{},
-      container: <InstanceType<typeof WebContainer> | null>null,
+      fileTree: <TFileTree>{}, // 文件树结构
+      container: <InstanceType<typeof WebContainer> | null>null, // container 容器
       boot: false, // 定义容器是否启动
-      install: false, // 定义项目依赖是否安装
       url: "", // 定义WebContainer 启动后的url
     };
   },
 
   actions: {
-    // 封装统一的输出函数 - 监听容器输出
+    /**
+     * 封装统一的输出函数 - 监听容器输出
+     * @param stdout
+     * @param fun
+     */
     async output(stdout: WebContainerProcess, fun: voidFun) {
       stdout.output.pipeTo(
         new WritableStream({
@@ -29,22 +32,33 @@ export const useContainerStore = defineStore("container", {
       );
     },
 
-    // 设置 filetree
+    /**
+     * 设置 filetree
+     * @param fileTree
+     */
     setFileTree(fileTree: TFileTree) {
       this.fileTree = fileTree;
       this.mountFile();
     },
 
-    // 1. bootContainer 启动容器
+    /**
+     * bootContainer 启动容器
+     */
     bootContainer() {
       tryCatch(async () => {
         this.container = await WebContainer.boot();
         this.boot = true;
-        this.listenServer();
+        this.container.on("server-ready", (_port: number, url: string) => {
+          this.url = url;
+        });
+        console.clear();
+        console.log("## Web Container Booted.");
       });
     },
 
-    // 2. 挂载文件
+    /**
+     * 挂载文件 - 外部不可用
+     */
     mountFile() {
       tryCatch(async () => {
         if (!this.container) return;
@@ -52,27 +66,23 @@ export const useContainerStore = defineStore("container", {
       });
     },
 
-    // 3. 执行 terminal 命令
+    /**
+     * 执行 terminal 命令
+     * @param cmd
+     * @param fun
+     */
     runTerminal(cmd: string, fun: voidFun) {
       tryCatch(async () => {
         if (!this.container) return;
         const command = cmd.split(" "); // 这里是按空格进行分割
         const state = await this.container.spawn(command[0], command.slice(1));
         // 如果是下载命令，则需要获取状态码
-        if (command[1] === "install" || command[1] === "i") {
-          const code = await state.exit;
-          if (code === 0) this.install = true;
-        }
+        // if (command[1] === "install" || command[1] === "i") {
+        //   const code = await state.exit;
+        //   // if (code === 0) this.install = true;
+        // }
         // 不管成功还是失败，都输出
         this.output(state, fun);
-      });
-    },
-
-    // 监听 server ready 事件
-    listenServer() {
-      if (!this.container) return;
-      this.container.on("server-ready", (_port: number, url: string) => {
-        this.url = url;
       });
     },
 
@@ -81,18 +91,39 @@ export const useContainerStore = defineStore("container", {
      *  1. 读取文件内容 - monaco用
      *  2. 写入文件内容 - monaco 用
      *  3. 删除文件/文件夹
-     *  4. 新建文件/文件夹 mkdir
+     *  4. 新建文件/文件夹
      *  5. 读取目录 - 转成tree datasuorce
      */
-    readFile() {},
-    writeFile() {},
-    deleteFile() {},
+    async readFile() {},
+    async writeFile(
+      path: string,
+      data: string | Uint8Array,
+      options?: { encoding?: null | BufferEncoding } | null
+    ) {
+      await this.container?.fs.writeFile(path, data, options);
+    },
+    async rename(oldname: string, newname: string) {
+      await this.container?.fs.rename(oldname, newname);
+    },
+    async deleteFile(path: string) {
+      await this.container?.fs.rm(path, { recursive: true });
+    },
+    async addFolder(path: string) {
+      // Creates a new directory. If the directory already exists, it will throw an error.
+      tryCatch(async () => {
+        await this.container?.fs.mkdir(path);
+      });
+    },
+    async addFile(path: string) {
+      const contents = `console.log('当前文件: ${path}')`;
+      await this.writeFile(path, contents, { encoding: "utf8" });
+    },
     async getDirectory() {
       // 辅助函数 -  递归获取目录下的文件
       const getFileTree = async (
         root: string
       ): Promise<ITreeData | undefined> => {
-        let result = [];
+        const result = [];
 
         if (!this.container) return;
 
@@ -104,7 +135,6 @@ export const useContainerStore = defineStore("container", {
           const item = files[i];
 
           if (item.isDirectory()) {
-            // let _r =
             result.push({
               id: item.name,
               label: item.name,
@@ -128,7 +158,7 @@ export const useContainerStore = defineStore("container", {
         // @ts-ignore
         return result;
       };
-      const fileMenu = await getFileTree("/") as ITreeData;
+      const fileMenu = (await getFileTree("/")) as ITreeData;
       return sortFile(fileMenu);
     },
   },

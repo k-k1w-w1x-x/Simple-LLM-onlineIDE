@@ -11,8 +11,8 @@
       />
       <i class="iconfont icon-gengduo">
         <div class="more">
-          <span @click="initVue">init Vue</span>
-          <span>Time line</span>
+          <span @click="initVueProject">init Vue</span>
+          <span>Open Folder</span>
           <span>npm script</span>
         </div>
       </i>
@@ -43,8 +43,14 @@
           />
         </template>
         <template v-else>
-          <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
-          {{ node.label }}
+          <div class="tree-item">
+            <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
+            {{ node.label }}
+            <div class="opts">
+              <i @click="iconClick(3)" class="iconfont icon-rename"></i>
+              <i @click="iconClick(4)" class="iconfont icon-shanchu1"></i>
+            </div>
+          </div>
         </template>
       </template>
     </el-tree>
@@ -66,7 +72,7 @@ const {
   cancelChecked,
   confirm,
   newFileEnter,
-  initVue,
+  initVueProject,
 } = useFileMenu();
 </script>
 
@@ -129,5 +135,23 @@ const {
 
 .icon-gengduo:hover .more {
   display: flex !important;
+}
+.tree-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  &:hover {
+    .opts {
+      display: block;
+    }
+  }
+  .opts {
+    display: none;
+    margin-left: auto;
+    i {
+      margin-left: 6px;
+    }
+  }
 }
 </style>

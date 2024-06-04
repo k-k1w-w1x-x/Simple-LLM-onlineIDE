@@ -21,5 +21,9 @@ export interface ITreeDataIsNew {
 }
 
 export type ITreeData = (ITreeDataFile | ITreeDataFolder | ITreeDataIsNew)[];
+
 // Element Plus Tree 回调参数
 export type ITree = ITreeDataFile | ITreeDataFolder | ITreeDataIsNew;
+
+// getFullPath Params data type.
+export type TFullData = (ITreeDataFile | ITreeDataFolder)[];

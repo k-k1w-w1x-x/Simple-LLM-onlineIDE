@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4568361 */
-  src: url('iconfont.woff2?t=1717208500364') format('woff2'),
-       url('iconfont.woff?t=1717208500364') format('woff'),
-       url('iconfont.ttf?t=1717208500364') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4568361_bv8xfd8etc.woff2?t=1717406705126') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4568361_bv8xfd8etc.woff?t=1717406705126') format('woff'),
+       url('//at.alicdn.com/t/c/font_4568361_bv8xfd8etc.ttf?t=1717406705126') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-rename:before {
+  content: "\e63f";
+}
+
+.icon-shanchu1:before {
+  content: "\e8b6";
+}
+
+.icon-less:before {
+  content: "\e63e";
+}
+
+.icon-json:before {
+  content: "\e65f";
+}
+
+.icon-file-unknown-fill:before {
+  content: "\ebb5";
 }
 
 .icon-gengduo:before {
@@ -120,4 +140,3 @@
 .icon-shanchu:before {
   content: "\e63d";
 }
-

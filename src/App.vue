@@ -10,6 +10,12 @@
       </div>
       <vueTerminal />
     </div>
+
+    <!-- loading -->
+    <div class="loading" v-if="!containerStore.boot">
+      <div class="loader"></div>
+      <span>Wait for the web container to boot...</span>
+    </div>
   </div>
 </template>
 
@@ -18,10 +24,15 @@ import fileMenu from "./components/fileMenu.vue";
 import monacoEditor from "./components/monacoEditor.vue";
 import myIframe from "./components/iframe.vue";
 import vueTerminal from "./components/terminal/index.vue";
+import { useContainerStore } from "./pinia/useContainer";
+const containerStore = useContainerStore();
+// 1. 执行boot 操作
+containerStore.bootContainer();
 </script>
 
 <style lang="less" scoped>
 .editor-box {
+  position: relative;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -34,6 +45,22 @@ import vueTerminal from "./components/terminal/index.vue";
       flex: auto;
       display: flex;
     }
+  }
+}
+.loading {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  z-index: 88;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  span {
+    margin-left: 10px;
   }
 }
 </style>
