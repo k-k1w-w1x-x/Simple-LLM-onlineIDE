@@ -14,7 +14,7 @@
     <!-- loading -->
     <div class="loading" v-if="!containerStore.boot">
       <div class="loader"></div>
-      <span>Wait for the web container to boot...</span>
+      <span>{{ message }}</span>
     </div>
   </div>
 </template>
@@ -25,9 +25,15 @@ import monacoEditor from "./components/monaco/index..vue";
 import myIframe from "./components/iframe/index.vue";
 import vueTerminal from "./components/terminal/index.vue";
 import { useContainerStore } from "./pinia/useContainer";
+import { ref } from "vue";
 const containerStore = useContainerStore();
+let message = ref("Wait for the web container to boot...");
 // 1. 执行boot 操作
 containerStore.bootContainer();
+const timer = setTimeout(() => {
+  if (!containerStore.boot) message.value = "Faid to boot,Reload to try again.";
+  clearTimeout(timer);
+}, 10000);
 </script>
 
 <style>

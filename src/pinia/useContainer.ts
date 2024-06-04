@@ -49,7 +49,7 @@ export const useContainerStore = defineStore("container", {
         this.container = await WebContainer.boot();
         this.boot = true;
       } catch (error) {
-        console.log("reboot agan.");
+        console.log("reboot again.");
         this.container?.teardown();
         this.container = null;
         this.container = await WebContainer.boot();
