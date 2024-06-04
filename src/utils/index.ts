@@ -1,11 +1,6 @@
 // 文件icon 映射
 import { voidFun } from "../type";
-import {
-  ITreeData,
-  ITreeDataFile,
-  ITreeDataFolder,
-  TFullData,
-} from "../type/fileMenu";
+import { ITreeData, TFullData } from "../type/fileMenu";
 
 /**
  * 通过文件后缀动态获取文件icon
@@ -88,12 +83,14 @@ export function getFullPath(
   targetId: string | number,
   path = <string[]>[]
 ): string[] | null {
-  for (let node of tree) {
+  for (const node of tree) {
     path.push(node.label);
 
     if (node.id === targetId) return path;
+    // eslint-disable-next-line
     // @ts-ignore
     if (node.children && node.children.length) {
+      // eslint-disable-next-line
       // @ts-ignore
       const parentPath = getFullPath(node.children, targetId, path.slice());
       if (parentPath) return parentPath;
