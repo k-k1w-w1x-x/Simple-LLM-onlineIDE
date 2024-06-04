@@ -29,7 +29,7 @@ export const useMonacoStore = defineStore("monaco", {
 
       // 3. 获取所有语言模型
       this.languages = languages.getLanguages();
-
+      console.log(this.languages);
       // 4. 监听事件
       this.editor.onKeyDown(this.onKeyDownHandle);
     },
@@ -47,7 +47,7 @@ export const useMonacoStore = defineStore("monaco", {
       });
       // 2. 设置语言模型
       const ITextModel = this.getEditor()?.getModel() as editor.ITextModel;
-      const languageModelId = languageModel?.id || "";
+      const languageModelId = languageModel?.id || "javascript";
       editor.setModelLanguage(ITextModel, languageModelId);
     },
 
