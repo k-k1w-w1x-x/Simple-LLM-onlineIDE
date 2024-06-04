@@ -30,6 +30,11 @@ const containerStore = useContainerStore();
 containerStore.bootContainer();
 </script>
 
+<style>
+@import url("./style.css");
+@import url("./assets/font_4568361_dguj7kf693r/iconfont.css");
+</style>
+
 <style lang="less" scoped>
 .editor-box {
   position: relative;
