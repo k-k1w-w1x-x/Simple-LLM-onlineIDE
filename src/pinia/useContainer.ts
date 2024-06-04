@@ -36,9 +36,9 @@ export const useContainerStore = defineStore("container", {
      * 设置 filetree
      * @param fileTree
      */
-    setFileTree(fileTree: TFileTree) {
+    async setFileTree(fileTree: TFileTree) {
       this.fileTree = fileTree;
-      this.mountFile();
+      await this.container?.mount(this.fileTree);
     },
 
     /**
@@ -53,16 +53,6 @@ export const useContainerStore = defineStore("container", {
         });
         console.clear();
         console.log("## Web Container Booted.");
-      });
-    },
-
-    /**
-     * 挂载文件 - 外部不可用
-     */
-    mountFile() {
-      tryCatch(async () => {
-        if (!this.container) return;
-        await this.container.mount(this.fileTree);
       });
     },
 

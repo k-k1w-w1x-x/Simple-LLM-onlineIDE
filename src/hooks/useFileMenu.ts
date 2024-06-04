@@ -195,7 +195,7 @@ export const useFileMenu = () => {
         // 需要在这里加上父级 - 这里还需要判断激活的是文件还是文件夹
         const currentNode = treeRef.value?.getNode(currentNodeKey.value); // 当前激活节点
         const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
-        let fullpath = getFullPath(dataMap, currentNodeKey.value);
+        let fullpath = <string[]>getFullPath(dataMap, currentNodeKey.value);
         if (currentNode?.data.isFolder) path += fullpath?.join("/");
         else {
           // 删除最后一项
@@ -220,12 +220,13 @@ export const useFileMenu = () => {
    *  2. 挂载 filetree
    */
   async function initVueProject() {
+    console.log("initVueProject");
     const data = JSON.parse(JSON.stringify(mock.vueProject));
-    containerStore.setFileTree(data);
+    await containerStore.setFileTree(data);
     // 解析当前data 转成数组
     const list = await containerStore.getDirectory();
     dataSource.length = 0;
-    dataSource.push(...list);
+    list.forEach((i) => dataSource.push(i));
   }
 
   return {

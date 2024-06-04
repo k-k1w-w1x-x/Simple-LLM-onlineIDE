@@ -85,7 +85,7 @@ export const require = (imgPath: string) => {
 // }
 export function getFullPath(
   tree: TFullData,
-  targetId: string,
+  targetId: string | number,
   path = <string[]>[]
 ): string[] | null {
   for (let node of tree) {
