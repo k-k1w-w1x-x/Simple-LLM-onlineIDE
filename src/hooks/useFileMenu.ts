@@ -9,7 +9,7 @@ import {
 } from "../type/fileMenu";
 import { getFullPath, getFileIcon, tryCatch } from "../utils";
 import type { ElTree } from "element-plus";
-import { voidFun } from "../type";
+import { TKeyMap, voidFun } from "../type";
 import { mock } from "../mock";
 import { useContainerStore } from "../pinia/useContainer";
 import { useMonacoStore } from "../pinia/useMonaco";
@@ -51,7 +51,7 @@ export const useFileMenu = () => {
     removeNewItem();
     newFileName.value = "";
     // 通过下标识别事件
-    const event: { [k: number]: voidFun } = [
+    const event: TKeyMap<number, voidFun> = [
       newFile,
       newFolder,
       collapseAll,
