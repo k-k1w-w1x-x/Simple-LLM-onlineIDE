@@ -2,7 +2,7 @@
   <div class="monaco-box">
     <!-- 实现多tab切换 -->
     <div class="monaco-box-bar">
-      <span class="active">{{ monacoStore.currentFile?.label }}</span>
+      <span class="active">{{ fileMenuStore.currentFile?.label }}</span>
     </div>
     <div class="monaco-box-container"></div>
   </div>
@@ -11,8 +11,9 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useMonacoStore } from "../../pinia/useMonaco";
+import { useFileMenuStore } from "../../pinia/useFileMenu";
 const monacoStore = useMonacoStore();
-
+const fileMenuStore = useFileMenuStore();
 onMounted(() => {
   monacoStore.initMonaco(".monaco-box-container");
 });

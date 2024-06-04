@@ -112,8 +112,7 @@ export const useContainerStore = defineStore("container", {
       });
     },
     async addFile(path: string) {
-      const contents = `console.log('当前文件: ${path}')`;
-      await this.writeFile(path, contents, { encoding: "utf8" });
+      await this.writeFile(path, "", { encoding: "utf8" });
     },
     async getDirectory() {
       // 辅助函数 -  递归获取目录下的文件

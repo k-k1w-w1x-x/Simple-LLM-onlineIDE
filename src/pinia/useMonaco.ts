@@ -1,16 +1,17 @@
 // monaco 数据共享
 import { defineStore } from "pinia";
-import { ITreeDataFile } from "../type/fileMenu";
 import { editor, languages } from "monaco-editor";
 import { fixEnvError } from "../utils/monaco.ts";
 import { toRaw } from "vue";
 import { TKeyMap, voidFun } from "../type/index.ts";
+import { useContainerStore } from "./useContainer.ts";
+import { useFileMenuStore } from "./useFileMenu.ts";
+
 export const useMonacoStore = defineStore("monaco", {
   state: () => {
     return {
       languages: <languages.ILanguageExtensionPoint[]>[],
       editor: <editor.IStandaloneCodeEditor | null>null,
-      currentFile: <ITreeDataFile | null>null,
     };
   },
 
@@ -44,10 +45,10 @@ export const useMonacoStore = defineStore("monaco", {
       const languageModel = this.languages.find((item) => {
         return item.extensions?.includes(`.${language}`);
       });
-      editor.setModelLanguage(
-        this.getEditor()?.getModel()!,
-        languageModel?.id || ""
-      );
+      // 2. 设置语言模型
+      const ITextModel = this.getEditor()?.getModel() as editor.ITextModel;
+      const languageModelId = languageModel?.id || "";
+      editor.setModelLanguage(ITextModel, languageModelId);
     },
 
     /** 获取编辑器的值 */
@@ -55,27 +56,34 @@ export const useMonacoStore = defineStore("monaco", {
       return this.getEditor()?.getValue();
     },
 
-    /** 设置当前文件信息 */
-    setCurrentFile(file: ITreeDataFile) {
-      this.currentFile = file;
-    },
-
-    // eslint-disable-next-line
-    // @ts-ignore keyDown 事件回调
-    onKeyDownHandle(e: any) {
-      e.browserEvent.preventDefault();
-
+    // keyDown 事件回调
+    onKeyDownHandle(e: {
+      keyCode: number;
+      ctrlKey: boolean;
+      shiftKey: boolean;
+      altKey: boolean;
+      browserEvent: { preventDefault: () => void };
+    }) {
       // 通过keycode/ctrlKey/shiftKey/altKey 的状态唯一确定一个事件- 有值为true，无值为false
       const eventMap: TKeyMap<string, voidFun> = {
-        "49/true/false/false": this.eventCtrlS,
+        "49/true/false/false": this.eventSave,
       };
       const key = `${e.keyCode}/${e.ctrlKey}/${e.shiftKey}/${e.altKey}`;
-      eventMap[key] && eventMap[key]();
+
+      if (eventMap[key]) {
+        eventMap[key]();
+        e.browserEvent.preventDefault();
+      }
     },
 
     // eventCtrlS
-    eventCtrlS() {
-      console.log("Ctrl S");
+    eventSave() {
+      const containerStore = useContainerStore();
+      const fileMenuStore = useFileMenuStore();
+      // 1. 获取当前编辑器的内容
+      const contents = this.getEditor()?.getValue() as string;
+      // 2. 调用 container 的 saveFile 方法
+      containerStore.writeFile(fileMenuStore.filePath, contents);
     },
   },
 });

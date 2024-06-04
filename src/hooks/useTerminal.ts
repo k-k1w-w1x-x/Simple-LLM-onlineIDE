@@ -12,12 +12,16 @@ export const useTerminal = () => {
     _cmdKey: string,
     command: string,
     success: voidFun,
-    _failed: voidFun,
-    _name: string
+    failed: voidFun,
+    name: string
   ) {
-    console.log("执行command:", command);
+    console.log("终端", name, "，执行command:", command);
     containerStore.runTerminal(command, (content) => {
-      success({ content });
+      try {
+        success({ content });
+      } catch (error) {
+        failed({ content: error });
+      }
     });
   }
 
