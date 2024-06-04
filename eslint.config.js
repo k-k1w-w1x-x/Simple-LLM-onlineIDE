@@ -16,13 +16,7 @@ export default [
   ...tseslint.configs.recommended,
   ...pluginVue.configs["flat/essential"],
   {
-    ignores: [
-      "dist",
-      "node_modules",
-      "src/assets/*",
-      "src/assets/*",
-      "public/*",
-    ],
+    ignores: ["dist", "node_modules", "src/assets/*", "public/*"],
   },
   {
     rules: {

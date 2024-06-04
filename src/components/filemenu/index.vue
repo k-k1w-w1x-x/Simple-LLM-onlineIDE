@@ -1,14 +1,21 @@
 <template>
   <div class="file-menu">
     <div class="file-menu-icons">
-      <img src="../assets/logo.svg" alt="" />
+      <img src="../../assets/logo.svg" alt="" />
       <i
         v-for="(i, d) in icons"
         :key="i"
-        @click="iconClick(d)"
+        @click="menuClick(d)"
         class="iconfont"
         :class="i"
       />
+      <i class="iconfont icon-gengduo">
+        <div class="more">
+          <span @click="initVueProject">init Vue</span>
+          <span>Open Folder</span>
+          <span>npm script</span>
+        </div>
+      </i>
     </div>
 
     <!-- 文件树 -->
@@ -24,7 +31,7 @@
         <!-- 这里需要实现新建文件的输入框 -->
         <template v-if="data.isNew">
           <el-input
-            ref="newFileRef"
+            ref="newInputRef"
             @blur="confirm"
             @keydown.enter="newFileEnter"
             v-model="newFileName"
@@ -36,8 +43,14 @@
           />
         </template>
         <template v-else>
-          <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
-          {{ node.label }}
+          <div class="tree-item">
+            <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
+            {{ node.label }}
+            <div class="opts">
+              <i @click="menuClick(3)" class="iconfont icon-rename"></i>
+              <i @click="menuClick(4)" class="iconfont icon-shanchu1"></i>
+            </div>
+          </div>
         </template>
       </template>
     </el-tree>
@@ -45,21 +58,32 @@
 </template>
 
 <script setup lang="ts">
-import { useFileMenu } from "../hooks/useFileMenu";
+import { watch } from "vue";
+import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
 
 const {
-  newFileRef,
+  newInputRef,
   newFileName,
   icons,
   treeRef,
   dataSource,
-  iconClick,
+  menuClick,
   nodeClick,
   cancelChecked,
   confirm,
   newFileEnter,
+  initVueProject,
 } = useFileMenu();
+import { useContainerStore } from "../../pinia/useContainer";
+const containerStore = useContainerStore();
+
+// demo
+watch(
+  () => containerStore.boot,
+  () => initVueProject(),
+  { immediate: false }
+);
 </script>
 
 <style lang="less" scoped>
@@ -68,6 +92,7 @@ const {
   border-right: solid #ccc 1px;
   padding: 10px;
   &-icons {
+    position: relative;
     box-sizing: content-box;
     height: 24px;
     display: flex;
@@ -95,5 +120,48 @@ const {
 .el-tree {
   user-select: none;
   height: calc(100% - 20px - 35px);
+}
+
+.more {
+  background-color: #fff;
+  border: solid rgba(204, 204, 204, 0.4) 1px;
+  z-index: 999;
+  position: absolute;
+  right: 0;
+  top: 25px;
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  display: none;
+  flex-direction: column;
+  span {
+    margin: 4px 0;
+    padding: 4px 8px;
+    cursor: pointer;
+    &:hover {
+      background-color: #ccc;
+    }
+  }
+}
+
+.icon-gengduo:hover .more {
+  display: flex !important;
+}
+.tree-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  &:hover {
+    .opts {
+      display: block;
+    }
+  }
+  .opts {
+    display: none;
+    margin-left: auto;
+    i {
+      margin-left: 6px;
+    }
+  }
 }
 </style>
