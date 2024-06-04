@@ -23,8 +23,11 @@ export const useFileMenu = () => {
 
   // 新建文件的 input v-model
   const newFileName = ref("");
-  // input ref
-  const newFileRef = ref<HTMLInputElement | null>(null);
+
+  // input ref 新建文件/文件夹的输入框 Ref
+  const newInputRef = ref<HTMLInputElement | null>(null);
+
+  // 新建文件标志 true ：文件  false ：文件夹
   const newFileFlag = ref(false);
 
   // 定义顶部icon - 静态
@@ -37,8 +40,11 @@ export const useFileMenu = () => {
   // data tree 数据源
   const dataSource = reactive<ITreeData>([]);
 
-  // filemenu icon click
-  function iconClick(d: number) {
+  /**
+   * 文件列表顶部菜单点击事件
+   * @param d 索引
+   */
+  function menuClick(d: number) {
     // 先清空所有添加的
     removeNewItem();
     newFileName.value = "";
@@ -54,7 +60,7 @@ export const useFileMenu = () => {
   }
 
   /**
-   * 新建文件/文件夹，需要对数据进行操作
+   * 新建文件/文件夹，需要添加 isNew 属性
    * @param isFolder
    */
   async function addNewItem(isFolder: boolean) {
@@ -81,15 +87,14 @@ export const useFileMenu = () => {
     }
     // 2. 然后获取焦点
     await nextTick();
-    newFileRef.value?.focus();
+    newInputRef.value?.focus();
   }
-  // 删除isNew 节点，确保整个过程只有一个新建节点
+
+  // 删除 isNew 节点，确保整个过程只有一个新建节点
   function removeNewItem(data?: ITreeData) {
     const list = data || dataSource;
     list.forEach((item, index) => {
-      if (Object.hasOwn(item, "isNew")) {
-        list.splice(index, 1);
-      }
+      if (Object.hasOwn(item, "isNew")) list.splice(index, 1);
       if (Object.hasOwn(item, "children"))
         removeNewItem(
           (item as ITreeDataFolder).children as unknown as ITreeData
@@ -140,17 +145,19 @@ export const useFileMenu = () => {
   function cancelChecked() {
     removeNewItem(dataSource);
     newFileName.value = "";
-    //  .is-current 通过该类实现的当前文件激活样式
     currentNodeKey.value = "";
     treeRef.value?.setCurrentKey();
   }
 
+  /**
+   * newFileEnter 新建文件/文件夹回车事件
+   */
   function newFileEnter() {
-    newFileRef.value?.blur();
+    newInputRef.value?.blur();
   }
 
   /**
-   * confirm 新建文件/文件夹确认事件
+   * 回车/确定按钮/失焦 触发的确认事件回调
    */
   function confirm() {
     removeNewItem(dataSource);
@@ -230,13 +237,13 @@ export const useFileMenu = () => {
   }
 
   return {
-    newFileRef,
+    newInputRef,
     newFileName,
     treeRef,
     icons,
     dataSource,
     currentNodeKey,
-    iconClick,
+    menuClick,
     nodeClick,
     cancelChecked,
     confirm,

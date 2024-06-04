@@ -20,6 +20,7 @@ export interface ITreeDataIsNew {
   isFolder: boolean;
 }
 
+// filemenu Tree Data type
 export type ITreeData = (ITreeDataFile | ITreeDataFolder | ITreeDataIsNew)[];
 
 // Element Plus Tree 回调参数

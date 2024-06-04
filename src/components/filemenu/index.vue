@@ -5,7 +5,7 @@
       <i
         v-for="(i, d) in icons"
         :key="i"
-        @click="iconClick(d)"
+        @click="menuClick(d)"
         class="iconfont"
         :class="i"
       />
@@ -31,7 +31,7 @@
         <!-- 这里需要实现新建文件的输入框 -->
         <template v-if="data.isNew">
           <el-input
-            ref="newFileRef"
+            ref="newInputRef"
             @blur="confirm"
             @keydown.enter="newFileEnter"
             v-model="newFileName"
@@ -47,8 +47,8 @@
             <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
             {{ node.label }}
             <div class="opts">
-              <i @click="iconClick(3)" class="iconfont icon-rename"></i>
-              <i @click="iconClick(4)" class="iconfont icon-shanchu1"></i>
+              <i @click="menuClick(3)" class="iconfont icon-rename"></i>
+              <i @click="menuClick(4)" class="iconfont icon-shanchu1"></i>
             </div>
           </div>
         </template>
@@ -58,16 +58,16 @@
 </template>
 
 <script setup lang="ts">
-import { useFileMenu } from "../hooks/useFileMenu";
+import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
 
 const {
-  newFileRef,
+  newInputRef,
   newFileName,
   icons,
   treeRef,
   dataSource,
-  iconClick,
+  menuClick,
   nodeClick,
   cancelChecked,
   confirm,

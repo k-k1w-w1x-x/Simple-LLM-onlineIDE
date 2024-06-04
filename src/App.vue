@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import fileMenu from "./components/fileMenu.vue";
-import monacoEditor from "./components/monacoEditor.vue";
-import myIframe from "./components/iframe.vue";
+import fileMenu from "./components/filemenu/index.vue";
+import monacoEditor from "./components/monaco/index..vue";
+import myIframe from "./components/iframe/index.vue";
 import vueTerminal from "./components/terminal/index.vue";
 import { useContainerStore } from "./pinia/useContainer";
 const containerStore = useContainerStore();

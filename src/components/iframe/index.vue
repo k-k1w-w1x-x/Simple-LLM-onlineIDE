@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { useContainerStore } from "../pinia/useContainer";
+import { useContainerStore } from "../../pinia/useContainer";
 const containerStore = useContainerStore();
 </script>
 
@@ -26,3 +26,4 @@ const containerStore = useContainerStore();
   justify-content: center;
 }
 </style>
+../../hooks/useFileMenu

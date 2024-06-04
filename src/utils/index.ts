@@ -60,24 +60,13 @@ export const require = (imgPath: string) => {
   }
 };
 
-// 解析路径 获取文件层级
-// export function getFullPath(
-//   tree: (ITreeDataFile | ITreeDataFolder)[],
-//   targetId: string | number,
-//   path: string[] = []
-// ) {
-//   if (!tree.length) return;
-//   for (let i = 0; i < tree.length; i++) {
-//     const item = tree[i];
-//     if (!item.label) continue;
-//     path.push(item.label);
-//     if (item.id === targetId) return path;
-//     if ((item as ITreeDataFolder).children.length)
-//       // eslint-disable-next-line
-//       // @ts-ignore
-//       return getFullPath(item.children, targetId, path.slice());
-//   }
-// }
+/**
+ * 解析文件完整父级路径 ，例如 ['src','index.js']
+ * @param tree 
+ * @param targetId 
+ * @param path 
+ * @returns 
+ */
 export function getFullPath(
   tree: TFullData,
   targetId: string | number,

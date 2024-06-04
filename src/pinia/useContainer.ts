@@ -9,10 +9,10 @@ import { ITreeData } from "../type/fileMenu";
 export const useContainerStore = defineStore("container", {
   state: () => {
     return {
-      fileTree: <TFileTree>{}, // 文件树结构
-      container: <InstanceType<typeof WebContainer> | null>null, // container 容器
       boot: false, // 定义容器是否启动
       url: "", // 定义WebContainer 启动后的url
+      fileTree: <TFileTree>{}, // 文件树结构
+      container: <InstanceType<typeof WebContainer> | null>null, // container 容器
     };
   },
 
@@ -22,7 +22,7 @@ export const useContainerStore = defineStore("container", {
      * @param stdout
      * @param fun
      */
-    async output(stdout: WebContainerProcess, fun: voidFun) {
+    output(stdout: WebContainerProcess, fun: voidFun) {
       stdout.output.pipeTo(
         new WritableStream({
           write(data) {
@@ -42,18 +42,24 @@ export const useContainerStore = defineStore("container", {
     },
 
     /**
-     * bootContainer 启动容器
+     * bootContainer 启动容器 实现重连容器
      */
-    bootContainer() {
-      tryCatch(async () => {
+    async bootContainer() {
+      try {
         this.container = await WebContainer.boot();
         this.boot = true;
-        this.container.on("server-ready", (_port: number, url: string) => {
-          this.url = url;
-        });
-        console.clear();
-        console.log("## Web Container Booted.");
+      } catch (error) {
+        console.log("reboot agan.");
+        this.container?.teardown();
+        this.container = null;
+        this.container = await WebContainer.boot();
+      }
+      this.container.on("server-ready", (_port: number, url: string) => {
+        console.log("server-ready.");
+        this.url = url;
       });
+
+      console.log("## Web Container Booted.");
     },
 
     /**
