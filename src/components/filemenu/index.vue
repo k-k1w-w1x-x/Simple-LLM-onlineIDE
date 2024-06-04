@@ -1,7 +1,7 @@
 <template>
   <div class="file-menu">
     <div class="file-menu-icons">
-      <img src="../assets/logo.svg" alt="" />
+      <img src="../../assets/logo.svg" alt="" />
       <i
         v-for="(i, d) in icons"
         :key="i"
