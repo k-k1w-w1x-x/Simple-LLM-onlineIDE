@@ -14,7 +14,6 @@ import { mock } from "../mock";
 import { useContainerStore } from "../pinia/useContainer";
 import { useMonacoStore } from "../pinia/useMonaco";
 import { useFileMenuStore } from "../pinia/useFileMenu";
-
 export const useFileMenu = () => {
   // 数据仓库
   const containerStore = useContainerStore();
@@ -155,8 +154,10 @@ export const useFileMenu = () => {
     const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
     const fullpath = <string[]>getFullPath(dataMap, data.id);
     const path = "/" + fullpath.join("/");
-    const contents = await containerStore.readFile(path);
-    monacoStore.setValue(contents as string, (data as ITreeDataFile).suffix);
+    // 这里可以使用单例模式或者多例模式
+    // const contents = await containerStore.readFile(path);
+    // monacoStore.setValue(contents as string, (data as ITreeDataFile).suffix);
+    monacoStore.addFile(data as ITreeDataFile);
     fileMenuStore.setFilePath(path);
   }
 

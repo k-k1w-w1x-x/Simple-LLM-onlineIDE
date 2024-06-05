@@ -2,21 +2,25 @@
   <div class="monaco-box">
     <!-- 实现多tab切换 -->
     <div class="monaco-box-bar">
-      <span class="active">{{ fileMenuStore.currentFile?.label }}</span>
+      <span
+        @click="monacoStore.switchFile(index)"
+        v-for="(file, index) in monacoStore.fileList"
+        :key="index"
+        :class="{ active: monacoStore.currentFile === index }"
+      >
+        {{ file?.label }}
+      </span>
     </div>
-    <div class="monaco-box-container"></div>
+    <div class="monaco-box-container" v-if="monacoStore.fileList.length"></div>
+    <div class="monaco-box-empty" v-else>
+      <i class="iconfont icon-CodeSandbox"></i>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { useMonacoStore } from "../../pinia/useMonaco";
-import { useFileMenuStore } from "../../pinia/useFileMenu";
 const monacoStore = useMonacoStore();
-const fileMenuStore = useFileMenuStore();
-onMounted(() => {
-  monacoStore.initMonaco(".monaco-box-container");
-});
 </script>
 
 <style lang="less" scoped>
@@ -45,5 +49,21 @@ onMounted(() => {
     overflow: hidden;
     height: calc(100% - 30px);
   }
+  &-empty {
+    overflow: hidden;
+    height: calc(100% - 30px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    i {
+      font-size: 120px;
+      color: rgba(70, 128, 255, 0.3);
+    }
+  }
+}
+.el-button {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 </style>
