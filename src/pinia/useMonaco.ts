@@ -11,11 +11,12 @@ import { ITreeDataFile } from "../type/fileMenu.ts";
 export const useMonacoStore = defineStore("monaco", {
   state: () => {
     return {
+      selector: ".monaco-box-container",
       languages: <languages.ILanguageExtensionPoint[]>[],
       editor: <editor.IStandaloneCodeEditor | null>null,
       fileStateMap: new Map<string, any>(), // 1. 关键参数 map
       fileList: <ITreeDataFile[]>[], // 定义当前文件列表 - 实现 tab 切换
-      currentFile: 0, // 当前文件 - 使用下标索引
+      currentFileID: "", // 当前文件ID
       containerStore: useContainerStore(),
       fileMenuStore: useFileMenuStore(),
     };
@@ -25,21 +26,25 @@ export const useMonacoStore = defineStore("monaco", {
     /**
      * 初始化 monaco
      */
-    initMonaco(selector: string) {
+    initEditor() {
       if (this.editor) return;
       this.fileStateMap.clear();
       // 1. 修复worker 异常问题
       fixEnvError();
-
       // 2. 创建 editor 实例
-      const dom = document.querySelector(selector) as HTMLElement;
-      this.editor = editor.create(dom);
-
+      const dom = document.querySelector(this.selector) as HTMLElement;
       // 3. 获取所有语言模型
       this.languages = languages.getLanguages();
-
+      this.editor = editor.create(dom);
       // 4. 监听事件
       this.editor.onKeyDown(this.onKeyDownHandle);
+    },
+
+    // 销毁editor
+    destroyEditor() {
+      this.getEditor()?.dispose();
+      this.editor = null;
+      // this.containerStore.destroyContainer();
     },
 
     /** 通过传入的 后缀 获取Monaco language */
@@ -47,11 +52,6 @@ export const useMonacoStore = defineStore("monaco", {
       return this.languages.find((item) =>
         item.extensions?.includes(`.${suffix}`)
       );
-    },
-
-    //   获取当前文件ID
-    getCurrentFileID() {
-      return this.fileList[this.currentFile].id;
     },
 
     /** 为了避免Vue响应式对编辑器的影响，使用toRaw转成普通对象 */
@@ -110,29 +110,46 @@ export const useMonacoStore = defineStore("monaco", {
         // 添加文件到列表
         this.fileList.push(file);
         await nextTick();
-        if (!this.editor) this.initMonaco(".monaco-box-container");
+        this.initEditor();
       }
 
       //  更新index
-      this.switchFile(this.fileList.findIndex((i) => i.id === file.id));
+      this.switchFile(file.id);
     },
 
     //  删除文件
-    deleteFile() {},
+    deleteFile(id: string) {
+      // 删除文件 tab 标签
+      this.fileList.splice(
+        this.fileList.findIndex((i) => i.id === id),
+        1
+      );
+      // 删除 stateMap
+      this.fileStateMap.delete(id);
+      // 关闭 editor
+      if (!this.fileList.length) return this.destroyEditor();
+      //  更新index - 取第一个
+      this.switchFile(this.fileList[0].id);
+    },
 
     //   切换文件 - 需要保存 state
-    async switchFile(index: number) {
-      const fileSuffix = this.fileList[index].suffix;
+    async switchFile(id: string) {
+      if (!this.fileList.length) return;
+      const fileSuffix = this.fileList.find((i) => i.id === id)
+        ?.suffix as string;
+
       // 2. 跳转到指定文件
-      this.currentFile = index;
+      this.currentFileID = id;
 
       // 3. 看看跳转后文件时候有 model 有的话直接使用，没有就创建新的
-      const file = this.fileStateMap.get(this.getCurrentFileID());
+      const file = this.fileStateMap.get(id);
 
       if (file && file.model) {
+        console.log("有map");
         this.setModel(toRaw(file.model));
         this.restoreViewState(toRaw(file.state)); // 恢复文件的编辑状态
       } else {
+        console.log("无map");
         // 2. 读取文件内容赋给monaco
         const contents = await this.containerStore.readFile(
           this.fileMenuStore.filePath
@@ -145,7 +162,7 @@ export const useMonacoStore = defineStore("monaco", {
 
         this.setModel(model);
 
-        this.fileStateMap.set(this.getCurrentFileID(), {
+        this.fileStateMap.set(id, {
           model: this.getModel(),
           state: this.saveViewState(),
         });
@@ -163,7 +180,7 @@ export const useMonacoStore = defineStore("monaco", {
     }) {
       // 通过keycode/ctrlKey/shiftKey/altKey 的状态唯一确定一个事件- 有值为true，无值为false
       const eventMap: TKeyMap<string, voidFun> = {
-        "49/true/false/false": this.eventSave,
+        "49/true/false/false": this.eventSave, // Ctrl + S
       };
       const key = `${e.keyCode}/${e.ctrlKey}/${e.shiftKey}/${e.altKey}`;
 
@@ -173,12 +190,16 @@ export const useMonacoStore = defineStore("monaco", {
       }
     },
 
-    // eventCtrlS
-    eventSave() {
-      // 1. 获取当前编辑器的内容
+    // Ctrl S
+    async eventSave() {
+      // 1. 获取当前编辑器的内容-因为支持多tab 不能直接取当前，应该取当前的id对应的内容
       const contents = this.getEditor()?.getValue() as string;
+      
       // 2. 调用 container 的 saveFile 方法
-      this.containerStore.writeFile(this.fileMenuStore.filePath, contents);
+      await this.containerStore.writeFile(
+        this.fileMenuStore.filePath,
+        contents
+      );
     },
   },
 });

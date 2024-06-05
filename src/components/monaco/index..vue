@@ -3,10 +3,12 @@
     <!-- 实现多tab切换 -->
     <div class="monaco-box-bar">
       <span
-        @click="monacoStore.switchFile(index)"
+        data-key="closeFileButton"
+        :data-fileID="file.id"
+        @click="monacoStore.switchFile(file.id)"
         v-for="(file, index) in monacoStore.fileList"
         :key="index"
-        :class="{ active: monacoStore.currentFile === index }"
+        :class="{ active: monacoStore.currentFileID === file.id }"
       >
         {{ file?.label }}
       </span>
@@ -21,6 +23,17 @@
 <script setup lang="ts">
 import { useMonacoStore } from "../../pinia/useMonaco";
 const monacoStore = useMonacoStore();
+
+window.addEventListener("mouseup", async (e: MouseEvent) => {
+  const span = e.target as HTMLElement;
+  if (e.button === 1 && span.getAttribute("data-key") === "closeFileButton") {
+    // 1. 先保存
+    await monacoStore.eventSave();
+    // 2. 关闭文件
+    const fileID = span.getAttribute("data-fileID") as string;
+    monacoStore.deleteFile(fileID);
+  }
+});
 </script>
 
 <style lang="less" scoped>
