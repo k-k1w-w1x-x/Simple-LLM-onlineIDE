@@ -23,13 +23,9 @@
 <script setup lang="ts">
 import { useMonacoStore } from "../../pinia/useMonaco";
 const monacoStore = useMonacoStore();
-
 window.addEventListener("mouseup", async (e: MouseEvent) => {
   const span = e.target as HTMLElement;
   if (e.button === 1 && span.getAttribute("data-key") === "closeFileButton") {
-    // 1. 先保存
-    await monacoStore.eventSave();
-    // 2. 关闭文件
     const fileID = span.getAttribute("data-fileID") as string;
     monacoStore.deleteFile(fileID);
   }

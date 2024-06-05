@@ -1,4 +1,4 @@
-import { nextTick, reactive, ref } from "vue";
+import { nextTick, reactive, ref, watch } from "vue";
 import {
   ITreeData,
   ITree,
@@ -19,7 +19,6 @@ export const useFileMenu = () => {
   const containerStore = useContainerStore();
   const monacoStore = useMonacoStore();
   const fileMenuStore = useFileMenuStore();
-
   // 定义树节点 Ref -  InstanceType 处理 ElTree 页面dom 问题
   const treeRef = ref<InstanceType<typeof ElTree> | null>(null);
 
@@ -44,6 +43,16 @@ export const useFileMenu = () => {
 
   // data tree 数据源
   const dataSource = reactive<ITreeData>([]);
+
+  // 数据同步
+  watch(
+    () => dataSource,
+    () => fileMenuStore.setDataSource(dataSource as ITreeData),
+    {
+      immediate: true,
+      deep: true,
+    }
+  );
 
   /**
    * 文件列表顶部菜单点击事件
@@ -142,23 +151,7 @@ export const useFileMenu = () => {
     removeNewItem(dataSource);
     newFileName.value = "";
     currentNodeKey.value = data.id;
-    if (!data.isFolder) {
-      fileMenuStore.setCurrentFile(data as ITreeDataFile);
-      readFile(data);
-    }
-  }
-
-  // 进行文件操作 - 获取文件内容赋值给 monaco editor
-  async function readFile(data: ITree) {
-    // 1. 通过ID 查找完整路径
-    const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
-    const fullpath = <string[]>getFullPath(dataMap, data.id);
-    const path = "/" + fullpath.join("/");
-    // 这里可以使用单例模式或者多例模式
-    // const contents = await containerStore.readFile(path);
-    // monacoStore.setValue(contents as string, (data as ITreeDataFile).suffix);
-    monacoStore.addFile(data as ITreeDataFile);
-    fileMenuStore.setFilePath(path);
+    if (!data.isFolder) monacoStore.addFile(data as ITreeDataFile);
   }
 
   /**

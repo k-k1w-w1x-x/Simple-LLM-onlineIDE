@@ -5,8 +5,9 @@ import { fixEnvError } from "../utils/monaco.ts";
 import { nextTick, toRaw } from "vue";
 import { TKeyMap, voidFun } from "../type/index.ts";
 import { useContainerStore } from "./useContainer.ts";
+import { ITreeDataFile, TFullData } from "../type/fileMenu.ts";
 import { useFileMenuStore } from "./useFileMenu.ts";
-import { ITreeDataFile } from "../type/fileMenu.ts";
+import { getFullPath } from "../utils/index.ts";
 
 export const useMonacoStore = defineStore("monaco", {
   state: () => {
@@ -117,13 +118,36 @@ export const useMonacoStore = defineStore("monaco", {
       this.switchFile(file.id);
     },
 
+    // 获取文件 path
+    getFilePath(id: string) {
+      const data = this.fileMenuStore.dataSource as TFullData;
+      const fullpath = <string[]>getFullPath(data, id);
+      return "/" + fullpath.join("/");
+    },
+
     //  删除文件
-    deleteFile(id: string) {
+    async deleteFile(id: string) {
       // 删除文件 tab 标签
       this.fileList.splice(
         this.fileList.findIndex((i) => i.id === id),
         1
       );
+      /**
+       * 需要将被删除的文件，内容更新为被删除的monaco 的value
+       *  1. 被删除文件的path路径
+       *  2. 被删除文件的mnaco editor value
+       */
+      console.group("delete File");
+      console.log("currentFileID", this.currentFileID);
+      console.log("deleteFileID", id);
+      // 1. 找path
+      const path = this.getFilePath(id);
+      console.log("删除文件的path", path);
+      //  2. 先跳过去 获取 model value
+      this.switchFile(id);
+      const value = this.getValue();
+      // 3. 保存
+      await this.containerStore.writeFile(path, value as string);
       // 删除 stateMap
       this.fileStateMap.delete(id);
       // 关闭 editor
@@ -152,7 +176,7 @@ export const useMonacoStore = defineStore("monaco", {
         console.log("无map");
         // 2. 读取文件内容赋给monaco
         const contents = await this.containerStore.readFile(
-          this.fileMenuStore.filePath
+          this.getFilePath(id)
         );
 
         const model = this.createModel(
@@ -194,10 +218,10 @@ export const useMonacoStore = defineStore("monaco", {
     async eventSave() {
       // 1. 获取当前编辑器的内容-因为支持多tab 不能直接取当前，应该取当前的id对应的内容
       const contents = this.getEditor()?.getValue() as string;
-      
+
       // 2. 调用 container 的 saveFile 方法
       await this.containerStore.writeFile(
-        this.fileMenuStore.filePath,
+        this.getFilePath(this.currentFileID),
         contents
       );
     },
