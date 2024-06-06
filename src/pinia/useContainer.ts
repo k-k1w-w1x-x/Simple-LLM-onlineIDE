@@ -98,6 +98,7 @@ export const useContainerStore = defineStore("container", {
       options?: { encoding?: null | BufferEncoding } | null
     ) {
       await this.container?.fs.writeFile(path, data, options);
+      console.log('container writeFile successful.');
     },
     async rename(oldname: string, newname: string) {
       await this.container?.fs.rename(oldname, newname);

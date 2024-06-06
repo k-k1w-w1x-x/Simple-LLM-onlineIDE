@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4568361 */
-  src: url('//at.alicdn.com/t/c/font_4568361_bv8xfd8etc.woff2?t=1717406705126') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4568361_bv8xfd8etc.woff?t=1717406705126') format('woff'),
-       url('//at.alicdn.com/t/c/font_4568361_bv8xfd8etc.ttf?t=1717406705126') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4568361_w4axl6nf3k.woff2?t=1717551656830') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4568361_w4axl6nf3k.woff?t=1717551656830') format('woff'),
+       url('//at.alicdn.com/t/c/font_4568361_w4axl6nf3k.ttf?t=1717551656830') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-CodeSandbox:before {
+  content: "\eac2";
 }
 
 .icon-rename:before {

@@ -20,9 +20,11 @@ const vueProject: TFileTree = {
       "main.js": {
         file: {
           contents: `
-          import { createApp } from "vue";
-          import App from "./App.vue";
-          createApp(App).mount("#app");`,
+import { createApp } from "vue";
+
+import App from "./App.vue";
+
+createApp(App).mount("#app");`,
         },
       },
       "App.vue": {
@@ -35,45 +37,52 @@ const vueProject: TFileTree = {
   "index.html": {
     file: {
       contents: `
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Web IDE</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
-  </body>
+</body>
+
 </html>
 `,
     },
   },
   "package.json": {
     file: {
-      contents: JSON.stringify({
-        name: "demo",
-        scripts: {
-          dev: "vite",
-        },
-        dependencies: {
-          vue: "^3.4.21",
-        },
-        devDependencies: {
-          vite: "^5.2.0",
-          "@vitejs/plugin-vue": "^5.0.4",
-        },
-      }),
+      contents: `
+{
+    "name": "demo",
+    "scripts": {
+        "dev": "vite"
+    },
+    "dependencies": {
+        "vue": "^3.4.21"
+    },
+    "devDependencies": {
+        "vite": "^5.2.0",
+        "@vitejs/plugin-vue": "^5.0.4"
+    }
+}
+      `,
     },
   },
   "vite.config.js": {
     file: {
       contents: `
-      import { defineConfig } from "vite";
+import { defineConfig } from "vite";
+
 import vue from "@vitejs/plugin-vue";
-export default defineConfig({ 
+
+export default defineConfig({
     plugins: [vue()]
 })`,
     },
