@@ -1,5 +1,5 @@
 {
-  "name": "demo",
+  "name": "unicode-ide",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,6 +9,14 @@
     "build": "eslint . && vue-tsc && vite build",
     "preview": "vite preview"
   },
+  "keywords": [
+    "Monaco Editor",
+    "Vue-Web-Terminal",
+    "Vue-Web-IDE",
+    "Web Container",
+    "在线代码编辑器",
+    "Online Code Editor"
+  ],
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@types/node": "^20.13.0",

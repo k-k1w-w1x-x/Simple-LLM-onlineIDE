@@ -1,6 +1,6 @@
 ![logo](./public/logo.svg)
 
-# Web IDE 在线代码编辑器
+# Unicode-IDE 在线代码编辑器
 
 
 
@@ -55,7 +55,7 @@
 
 ## 联系交流
 
-如果对项目优化或功能有好的想法并乐意贡献代码欢迎提交[PR](https://gitee.com/wfeng0/web-ide/pulls) ，对项目使用存在疑问或发现bug请提交[issue](https://gitee.com/wfeng0/web-ide/issues)。
+如果对项目优化或功能有好的想法并乐意贡献代码欢迎提交[PR](https://gitee.com/wfeng0/unicode-ide/pulls) ，对项目使用存在疑问或发现bug请提交[issue](https://gitee.com/wfeng0/unicode-ide/issues)。
 
 欢迎大家加入QQ群，不限于Socket.IO、前端技术、Node等，都可以进行沟通交流哦~
 
