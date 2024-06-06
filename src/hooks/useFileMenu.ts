@@ -42,7 +42,14 @@ export const useFileMenu = () => {
   ];
 
   // data tree 数据源
-  const dataSource = reactive<ITreeData>([]);
+  const dataSource = reactive<ITreeData>([
+    {
+      id: "123",
+      label: "123.js",
+      suffix: "js",
+      isFolder: false,
+    },
+  ]);
 
   // 数据同步
   watch(
@@ -52,6 +59,12 @@ export const useFileMenu = () => {
       immediate: true,
       deep: true,
     }
+  );
+
+  watch(
+    () => containerStore.boot,
+    () => initVueProject(),
+    { immediate: false }
   );
 
   /**
@@ -152,6 +165,13 @@ export const useFileMenu = () => {
     newFileName.value = "";
     currentNodeKey.value = data.id;
     if (!data.isFolder) monacoStore.addFile(data as ITreeDataFile);
+  }
+
+  /**
+   * 节点右键单击回调 - 唤醒右键菜单
+   */
+  function nodeContextmenu(event: Event, data: ITree) {
+    event.preventDefault();
   }
 
   /**
@@ -264,5 +284,6 @@ export const useFileMenu = () => {
     confirm,
     newFileEnter,
     initVueProject,
+    nodeContextmenu,
   };
 };

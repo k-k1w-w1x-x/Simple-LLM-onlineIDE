@@ -23,6 +23,30 @@
 ​	而Monaco Editor则是从web Container中的文件关系进行文件读取编辑，保存后重新回写到Container中。
 
 
+## 运行环境
+
+- Node.js 18.x
+- Vue.js 3.x
+- Pnpm 8.x
+- Vite 5.x
+- Typescript 5.x
+- Eslint 9.x
+
+```javascript
+
+  //  克隆仓库
+  git clone https://gitee.com/wfeng0/unicode-ide.git
+  
+  //  推荐使用pnpm进行依赖管理
+  pnpm install
+  
+  //  本地运行
+  pnpm run dev
+
+  //  如果提交代码，请先执行 lint 与 build 命令进行代码检查与打包 ，确认没错误后再提交。
+
+
+```
 
 ## 整体效果
 

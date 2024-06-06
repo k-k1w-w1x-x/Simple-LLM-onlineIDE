@@ -1,5 +1,6 @@
 import { FileSystemTree } from "@webcontainer/api";
 import { editor } from "monaco-editor";
+import { ITree } from "./fileMenu";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type voidFun = (data?: any) => void;
@@ -20,3 +21,11 @@ export type TFileStateMap = Map<
     model: editor.ITextModel | null;
   }
 >;
+
+// 定义文件/文件夹右键菜单结构
+export type TFileMenu = {
+  isFolder: boolean;
+  label: string;
+  shortcut?: string;
+  callback: (d: ITree) => void;
+};

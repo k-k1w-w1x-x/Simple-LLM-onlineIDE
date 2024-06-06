@@ -1,5 +1,6 @@
 <template>
   <div class="file-menu">
+    <!-- 顶部 添加按钮 -->
     <div class="file-menu-icons">
       <img src="../../assets/logo.svg" alt="" />
       <i
@@ -25,6 +26,7 @@
       highlight-current
       node-key="id"
       @node-click="nodeClick"
+      @node-contextmenu="nodeContextmenu"
       @click.self="cancelChecked"
     >
       <template #default="{ node, data }">
@@ -42,15 +44,34 @@
             "
           />
         </template>
+        <!-- 正常的文件展示 -->
         <template v-else>
-          <div class="tree-item">
-            <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
-            {{ node.label }}
-            <div class="opts">
-              <i @click="menuClick(3)" class="iconfont icon-rename"></i>
-              <i @click="menuClick(4)" class="iconfont icon-shanchu1"></i>
+          <el-popover
+            :ref="setPopoverRef"
+            width="220"
+            placement="bottom-start"
+            trigger="contextmenu"
+            :show-arrow="false"
+            :hide-after="0"
+          >
+            <!-- 右键文件位置 -->
+            <div class="filemenu-contextmenu">
+              <div
+                v-for="menu in contextmenu"
+                :key="menu.label"
+                @click="menu.callback(data)"
+              >
+                <span>{{ menu.label }}</span>
+                <span>{{ menu.shortcut }}</span>
+              </div>
             </div>
-          </div>
+            <template #reference>
+              <div class="tree-item">
+                <img v-if="data.icon && !data.isFolder" :src="data.icon" />
+                {{ node.label }}
+              </div>
+            </template>
+          </el-popover>
         </template>
       </template>
     </el-tree>
@@ -58,9 +79,11 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
 import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
+import { useFileContextMenu } from "../../hooks/useFileContextMenu";
+
+const { contextmenu, setPopoverRef, closePopover } = useFileContextMenu();
 
 const {
   newInputRef,
@@ -75,19 +98,16 @@ const {
   newFileEnter,
   initVueProject,
 } = useFileMenu();
-import { useContainerStore } from "../../pinia/useContainer";
-const containerStore = useContainerStore();
 
-// demo
-watch(
-  () => containerStore.boot,
-  () => initVueProject(),
-  { immediate: false }
-);
+function nodeContextmenu() {
+  // 1. 先关闭其他 popover
+  closePopover();
+}
 </script>
 
 <style lang="less" scoped>
 .file-menu {
+  position: relative;
   width: 220px;
   border-right: solid #ccc 1px;
   padding: 10px;
@@ -151,16 +171,27 @@ watch(
   height: 100%;
   display: flex;
   align-items: center;
-  &:hover {
-    .opts {
-      display: block;
+}
+
+.filemenu-contextmenu {
+  width: 100%;
+  div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 4px 0;
+    cursor: pointer;
+    &:hover {
+      background-color: #f2f3f5;
     }
-  }
-  .opts {
-    display: none;
-    margin-left: auto;
-    i {
-      margin-left: 6px;
+    span:nth-child(1) {
+      font-weight: 600;
+    }
+    span:nth-child(2) {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.5);
     }
   }
 }
