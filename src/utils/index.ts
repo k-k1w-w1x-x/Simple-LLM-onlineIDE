@@ -3,10 +3,9 @@ import { voidFun } from "../type";
 import { ITreeData, TFullData } from "../type/fileMenu";
 
 /**
- * 通过文件后缀动态获取文件icon
- * 如果后缀不存在/或者找不到对应文件后缀，则会主动返回 unknown
+ * 通过文件后缀动态获取文件icon 如果后缀不存在/或者找不到对应文件后缀，则会主动返回 unknown
  * @param fileSuffix
- * @returns
+ * @returns string
  */
 export const getFileIcon = (fileSuffix: string) => {
   // 没有后缀名统一返回unknown
@@ -46,7 +45,9 @@ export function sortFile(data: ITreeData) {
     }
   });
   return temp.sort(function (a, b) {
-    return Number(a.id > b.id);
+    // eslint-disable-next-line
+    // @ts-ignore
+    return Number(a.label > b.label);
   });
 }
 
@@ -62,10 +63,10 @@ export const require = (imgPath: string) => {
 
 /**
  * 解析文件完整父级路径 ，例如 ['src','index.js']
- * @param tree 
- * @param targetId 
- * @param path 
- * @returns 
+ * @param tree
+ * @param targetId
+ * @param path
+ * @returns
  */
 export function getFullPath(
   tree: TFullData,
@@ -87,4 +88,37 @@ export function getFullPath(
     path.pop();
   }
   return null;
+}
+
+/**
+ * 获取新建文件/文件夹的 isNew data
+ */
+export function getNewFileMockData(isFolder: boolean) {
+  return {
+    id: Date.now().toString(),
+    isFolder,
+    isNew: true,
+  };
+}
+
+/**
+ * 确定了有输入后，需要根据输入的内容创建对应的 data
+ * @param isFolder 是否为文件夹
+ * @param label 文件/文件夹名称
+ * @param suffix 文件后缀
+ * @returns
+ */
+export function getNewFileData(
+  isFolder: boolean,
+  label: string,
+  suffix: string
+) {
+  // data.icon && !data.isFolder
+  return {
+    id: Date.now().toString(),
+    label,
+    isFolder,
+    icon: isFolder ? "" : getFileIcon(suffix),
+    suffix: suffix,
+  };
 }

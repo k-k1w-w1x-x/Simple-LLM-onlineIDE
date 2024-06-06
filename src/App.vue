@@ -13,13 +13,13 @@
     </div>
 
     <!-- loading -->
-    <!-- <div class="loading" v-if="!containerStore.boot">
+    <div class="loading" v-if="!containerStore.boot">
       <div class="loader" v-if="!bootedFlag" />
       <span :class="{ error: bootedFlag }">
         <span v-if="bootedFlag">⛔</span>
         {{ message }}
       </span>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -33,9 +33,9 @@ import { useLoading } from "./hooks/useLoading";
 const { message, bootedFlag, checkBooted } = useLoading();
 const containerStore = useContainerStore();
 // 1. 执行boot 操作
-// containerStore.bootContainer();
-// // 2. 定时检测容器挂载状态
-// checkBooted();
+containerStore.bootContainer();
+// 2. 定时检测容器挂载状态
+checkBooted();
 </script>
 
 <style lang="less" scoped>

@@ -4,6 +4,7 @@ import { getFileIcon, sortFile, tryCatch } from "../utils";
 import { defineStore } from "pinia";
 import { TFileTree, voidFun } from "../type";
 import { ITreeData } from "../type/fileMenu";
+
 // 第一个参数是应用程序中商店的唯一 id
 export const useContainerStore = defineStore("container", {
   state: () => {
@@ -32,7 +33,7 @@ export const useContainerStore = defineStore("container", {
     },
 
     /**
-     * 设置 filetree
+     * 设置 Container 挂载的文件树
      * @param fileTree
      */
     async setFileTree(fileTree: TFileTree) {
@@ -41,7 +42,7 @@ export const useContainerStore = defineStore("container", {
     },
 
     /**
-     * bootContainer 启动容器 实现重连容器
+     * bootContainer 启动容器并实现重连容器
      */
     async bootContainer() {
       try {
@@ -53,8 +54,8 @@ export const useContainerStore = defineStore("container", {
         this.container = null;
         this.container = await WebContainer.boot();
       }
-      this.container.on("server-ready", (_port: number, url: string) => {
-        console.log("server-ready.");
+      // 监听容器服务启动
+      this.container.on("server-ready", (_p: number, url: string) => {
         this.url = url;
       });
 
@@ -72,54 +73,66 @@ export const useContainerStore = defineStore("container", {
         const command = cmd.split(" "); // 这里是按空格进行分割
         const state = await this.container.spawn(command[0], command.slice(1));
         // 如果是下载命令，则需要获取状态码
-        // if (command[1] === "install" || command[1] === "i") {
-        //   const code = await state.exit;
-        //   // if (code === 0) this.install = true;
-        // }
-        // 不管成功还是失败，都输出
+        if (command[1] === "install" || command[1] === "i") {
+          const code = await state.exit;
+          if (code !== 0) throw Error("install failed.");
+        }
+
         this.output(state, fun);
       });
     },
 
     /**
-     * Web Container 的文件操作
-     *  1. 读取文件内容 - monaco用
-     *  2. 写入文件内容 - monaco 用
+     * Web Container File System API
+     *  1. 读取文件内容 -
+     *  2. 写入文件内容 -
      *  3. 删除文件/文件夹
      *  4. 新建文件/文件夹
-     *  5. 读取目录 - 转成tree datasuorce
+     *  5. 读取目录 - 转成 tree datasuorce
      */
+
+    /** 读取文件内容 */
     async readFile(path: string) {
       return await this.container?.fs.readFile(path, "utf8");
     },
+
+    /** 写入文件 */
     async writeFile(
       path: string,
       data: string | Uint8Array,
       options?: { encoding?: null | BufferEncoding } | null
     ) {
       await this.container?.fs.writeFile(path, data, options);
-      console.log('container writeFile successful.');
     },
-    async rename(oldname: string, newname: string) {
-      await this.container?.fs.rename(oldname, newname);
+
+    /** 重命名 */
+    async rename(oldpath: string, newpath: string) {
+      await this.container?.fs.rename(oldpath, newpath);
     },
+
+    /** 删除文件 */
     async deleteFile(path: string) {
       await this.container?.fs.rm(path, { recursive: true });
     },
-    async addFolder(path: string) {
+
+    /** 添加文件夹 */
+    async newFolder(path: string) {
       // Creates a new directory. If the directory already exists, it will throw an error.
       tryCatch(async () => {
         await this.container?.fs.mkdir(path);
       });
     },
-    async addFile(path: string) {
-      await this.writeFile(path, "", { encoding: "utf8" });
+
+    /** 添加文件 */
+    async newFile(path: string) {
+      await this.writeFile(path, "");
     },
+
+    /** 将 File System Tree转成 Element Plus El-Tree 数据结构 */
     async getDirectory() {
+      type TPV = Promise<ITreeData | undefined>;
       // 辅助函数 -  递归获取目录下的文件
-      const getFileTree = async (
-        root: string
-      ): Promise<ITreeData | undefined> => {
+      const getFileTree = async (root: string): TPV => {
         const result = [];
 
         if (!this.container) return;

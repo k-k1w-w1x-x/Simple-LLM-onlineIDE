@@ -14,7 +14,7 @@ export type TKeyMap<T extends string | number | symbol, V> = {
 };
 
 // fileStateMap monaco 语言模型状态和model 映射
-export type TFileStateMap = Map<
+export type TEditorStateMap = Map<
   string,
   {
     state: editor.ICodeEditorViewState | null;
@@ -24,8 +24,16 @@ export type TFileStateMap = Map<
 
 // 定义文件/文件夹右键菜单结构
 export type TFileMenu = {
-  isFolder: boolean;
   label: string;
   shortcut?: string;
   callback: (d: ITree) => void;
+};
+
+// 定义monaco event handle 回调参数类型
+export type TEditorEvent = {
+  keyCode: number;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  browserEvent: { preventDefault: voidFun };
 };

@@ -25,8 +25,8 @@
       :data="dataSource"
       highlight-current
       node-key="id"
-      @node-click="nodeClick"
-      @node-contextmenu="nodeContextmenu"
+      @node-click="treeNodeClick"
+      @node-contextmenu="closePopover"
       @click.self="cancelChecked"
     >
       <template #default="{ node, data }">
@@ -35,7 +35,7 @@
           <el-input
             ref="newInputRef"
             @blur="confirm"
-            @keydown.enter="newFileEnter"
+            @keydown.enter="newInputRef?.blur()"
             v-model="newFileName"
             :prefix-icon="data.isFolder ? FolderOpened : Document"
             size="small"
@@ -81,28 +81,22 @@
 <script setup lang="ts">
 import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
-import { useFileContextMenu } from "../../hooks/useFileContextMenu";
-
-const { contextmenu, setPopoverRef, closePopover } = useFileContextMenu();
+import { icons } from "../../config/index.ts";
 
 const {
+  contextmenu,
   newInputRef,
   newFileName,
-  icons,
   treeRef,
   dataSource,
   menuClick,
-  nodeClick,
+  treeNodeClick,
   cancelChecked,
   confirm,
-  newFileEnter,
   initVueProject,
+  setPopoverRef,
+  closePopover,
 } = useFileMenu();
-
-function nodeContextmenu() {
-  // 1. 先关闭其他 popover
-  closePopover();
-}
 </script>
 
 <style lang="less" scoped>
