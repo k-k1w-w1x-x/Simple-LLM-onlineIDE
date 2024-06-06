@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { editor, languages } from "monaco-editor";
 import { fixEnvError } from "../utils/monaco.ts";
 import { nextTick, toRaw } from "vue";
-import { TKeyMap, voidFun } from "../type/index.ts";
+import { TFileStateMap, TKeyMap, voidFun } from "../type/index.ts";
 import { useContainerStore } from "./useContainer.ts";
 import { ITreeDataFile, TFullData } from "../type/fileMenu.ts";
 import { useFileMenuStore } from "./useFileMenu.ts";
@@ -15,7 +15,7 @@ export const useMonacoStore = defineStore("monaco", {
       selector: ".monaco-box-container",
       languages: <languages.ILanguageExtensionPoint[]>[],
       editor: <editor.IStandaloneCodeEditor | null>null,
-      fileStateMap: new Map<string, any>(), // 1. 关键参数 map
+      fileStateMap: <TFileStateMap>new Map(), // 1. 关键参数 map
       fileList: <ITreeDataFile[]>[], // 定义当前文件列表 - 实现 tab 切换
       currentFileID: "", // 当前文件ID
       containerStore: useContainerStore(),
@@ -137,12 +137,9 @@ export const useMonacoStore = defineStore("monaco", {
        *  1. 被删除文件的path路径
        *  2. 被删除文件的mnaco editor value
        */
-      console.group("delete File");
-      console.log("currentFileID", this.currentFileID);
-      console.log("deleteFileID", id);
+
       // 1. 找path
       const path = this.getFilePath(id);
-      console.log("删除文件的path", path);
       //  2. 先跳过去 获取 model value
       this.switchFile(id);
       const value = this.getValue();
@@ -187,8 +184,8 @@ export const useMonacoStore = defineStore("monaco", {
         this.setModel(model);
 
         this.fileStateMap.set(id, {
-          model: this.getModel(),
-          state: this.saveViewState(),
+          model: this.getModel() as editor.ITextModel,
+          state: this.saveViewState() as editor.ICodeEditorViewState,
         });
       }
       this.getEditor()?.focus();
