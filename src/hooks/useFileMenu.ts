@@ -6,7 +6,6 @@ import {
   tryCatch,
   getNewFileMockData,
   getNewFileData,
-  sortFile,
 } from "../utils";
 import type { ElTree } from "element-plus";
 import { TFileMenu } from "../type";
@@ -54,19 +53,27 @@ export const useFileMenu = () => {
     {
       label: "在侧边打开",
       shortcut: "Ctrl + O",
+      ctrlKey: true,
+      keyCode: 79,
       callback: openFile,
     },
     {
       label: "打开时间线",
+      ctrlKey: null,
+      keyCode: null,
       callback: openTimeLine,
     },
     {
       label: "重命名",
       shortcut: "F2",
+      ctrlKey: false,
+      keyCode: 113,
       callback: renameFile,
     },
     {
       label: "删除",
+      ctrlKey: false,
+      keyCode: 46,
       shortcut: "Delete",
       callback: deleteFile,
     },
@@ -219,9 +226,9 @@ export const useFileMenu = () => {
 
     await nextTick();
     // 排序
-    const list = sortFile(JSON.parse(JSON.stringify(dataSource)));
-    dataSource.length = 0;
-    list.forEach((i) => dataSource.push(i));
+    // const list = sortFile(JSON.parse(JSON.stringify(dataSource)));
+    // dataSource.length = 0;
+    // list.forEach((i) => dataSource.push(i));
 
     // 将文件/文件夹添加到container文件系统中
     mountedFileSystemTree();
@@ -301,6 +308,29 @@ export const useFileMenu = () => {
     console.log("deleteFile", data);
   }
 
+  /** 初始化window事件 - 监听快捷菜单 */
+  function addWindowEvent() {
+    window.addEventListener("keydown", eventHandle);
+  }
+  function removeWindowEvent() {
+    window.removeEventListener("keydown", eventHandle);
+  }
+  function eventHandle(e: KeyboardEvent) {
+    const { ctrlKey, keyCode } = e;
+
+    // 不能用 forEach 进行事件处理，应该找到符合条件的才执行
+    const events = contextmenu.find(
+      (i) => i.ctrlKey === ctrlKey && i.keyCode === keyCode
+    );
+    if (!events) return;
+    e.stopPropagation();
+    e.preventDefault();
+    // 获取节点node
+    const node = treeRef.value?.getNode(currentNodeKey.value);
+    if (!node) return;
+    events.callback(node.data as ITree);
+  }
+
   return {
     contextmenu,
     newInputRef,
@@ -315,5 +345,7 @@ export const useFileMenu = () => {
     initVueProject,
     setPopoverRef,
     closePopover,
+    addWindowEvent,
+    removeWindowEvent,
   };
 };

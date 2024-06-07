@@ -10,13 +10,12 @@
         class="iconfont"
         :class="i"
       />
-      <i class="iconfont icon-gengduo">
-        <div class="more">
-          <span @click="initVueProject">init Vue</span>
-          <span>Open Folder</span>
-          <span>npm script</span>
-        </div>
-      </i>
+      <el-popover placement="top-end" :show-arrow="false" trigger="hover">
+        <div class="opts">123</div>
+        <template #reference>
+          <i class="iconfont icon-gengduo"> </i>
+        </template>
+      </el-popover>
     </div>
 
     <!-- 文件树 -->
@@ -82,6 +81,7 @@
 import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
 import { icons } from "../../config/index.ts";
+import { onBeforeMount, onMounted } from "vue";
 
 const {
   contextmenu,
@@ -93,10 +93,14 @@ const {
   treeNodeClick,
   cancelChecked,
   confirm,
-  initVueProject,
+  addWindowEvent,
   setPopoverRef,
   closePopover,
+  removeWindowEvent,
 } = useFileMenu();
+
+onMounted(addWindowEvent);
+onBeforeMount(removeWindowEvent);
 </script>
 
 <style lang="less" scoped>
@@ -136,30 +140,6 @@ const {
   height: calc(100% - 20px - 35px);
 }
 
-.more {
-  background-color: #fff;
-  border: solid rgba(204, 204, 204, 0.4) 1px;
-  z-index: 999;
-  position: absolute;
-  right: 0;
-  top: 25px;
-  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  display: none;
-  flex-direction: column;
-  span {
-    margin: 4px 0;
-    padding: 4px 8px;
-    cursor: pointer;
-    &:hover {
-      background-color: #ccc;
-    }
-  }
-}
-
-.icon-gengduo:hover .more {
-  display: flex !important;
-}
 .tree-item {
   width: 100%;
   height: 100%;

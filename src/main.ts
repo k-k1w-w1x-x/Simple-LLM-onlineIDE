@@ -5,7 +5,7 @@ import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 
 import Terminal from "vue-web-terminal";
-import "vue-web-terminal/lib/theme/light.css";
+// import "vue-web-terminal/lib/theme/light.css"; 通过主题切换实现
 
 import { createPinia } from "pinia";
 const pinia = createPinia();
@@ -13,6 +13,10 @@ const pinia = createPinia();
 // 引入必要css
 import "./style.css";
 import "./assets/font_4568361_dguj7kf693r/iconfont.css";
+
+// 主题切换
+import { setTheme } from "./utils/theme";
+setTheme("light");
 
 // eslint-disable-next-line
 // @ts-ignore

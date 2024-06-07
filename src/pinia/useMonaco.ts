@@ -189,7 +189,6 @@ export const useMonacoStore = defineStore("monaco", {
         const state = this.saveViewState() as editor.ICodeEditorViewState;
         this.editorStateMap.set(id, { model: newmodel, state });
       }
-      this.getEditor()?.focus();
     },
 
     // keyDown 事件回调

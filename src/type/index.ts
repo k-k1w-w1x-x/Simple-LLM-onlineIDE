@@ -25,6 +25,8 @@ export type TEditorStateMap = Map<
 // 定义文件/文件夹右键菜单结构
 export type TFileMenu = {
   label: string;
+  ctrlKey: boolean | null;
+  keyCode: number | null;
   shortcut?: string;
   callback: (d: ITree) => void;
 };
