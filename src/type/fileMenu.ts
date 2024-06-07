@@ -4,6 +4,7 @@ export interface ITreeDataFile {
   icon?: string;
   label: string;
   isFolder: boolean;
+  isRename?: boolean;
   suffix: string;
 }
 // 文件夹数据结构
@@ -11,6 +12,7 @@ export interface ITreeDataFolder {
   id: string;
   label: string;
   isFolder: boolean;
+  isRename?: boolean;
   children: ITreeData[];
 }
 // 可能是新建文件

@@ -43,6 +43,16 @@
             "
           />
         </template>
+        <template v-else-if="data.isRename">
+          <el-input
+            ref="renameInputRef"
+            @blur="renameHandle"
+            @keydown.enter="renameInputRef?.blur()"
+            :prefix-icon="Document"
+            v-model="renameValue"
+            size="small"
+          />
+        </template>
         <!-- 正常的文件展示 -->
         <template v-else>
           <el-popover
@@ -84,6 +94,8 @@ import { icons } from "../../config/index.ts";
 import { onBeforeMount, onMounted } from "vue";
 
 const {
+  renameInputRef,
+  renameValue,
   contextmenu,
   newInputRef,
   newFileName,
@@ -97,6 +109,7 @@ const {
   setPopoverRef,
   removeWindowEvent,
   treeNodeContextmenu,
+  renameHandle,
 } = useFileMenu();
 
 onMounted(addWindowEvent);

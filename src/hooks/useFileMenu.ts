@@ -13,6 +13,7 @@ import { mock } from "../mock";
 import { useContainerStore } from "../pinia/useContainer";
 import { useMonacoStore } from "../pinia/useMonaco";
 import { useFileMenuStore } from "../pinia/useFileMenu";
+import { TreeNodeData } from "element-plus/es/components/tree/src/tree.type.mjs";
 
 export const useFileMenu = () => {
   // 数据仓库
@@ -47,6 +48,10 @@ export const useFileMenu = () => {
 
   /** 定义 popover ref List */
   const popoverRefList = reactive<HTMLElement[]>([]);
+
+  /** 重命名 */
+  const renameInputRef = ref<HTMLInputElement | null>(null);
+  const renameValue = ref("");
 
   /** 定义文件右键菜单列表 */
   const contextmenu: TFileMenu[] = [
@@ -181,6 +186,17 @@ export const useFileMenu = () => {
     });
   }
 
+  /** 取消全部 isRename 属性 */
+  function removeRenameItem(data: ITreeData) {
+    data.forEach((item) => {
+      if (Object.hasOwn(item, "isRename"))
+        Reflect.deleteProperty(item, "isRename");
+      // eslint-disable-next-line
+      // @ts-ignore 递归
+      if (Object.hasOwn(item, "children")) removeRenameItem(item.children);
+    });
+  }
+
   /**
    * 展开当前节点 - 用于目录关闭状态下，新建文件时能够自己展开
    */
@@ -226,6 +242,7 @@ export const useFileMenu = () => {
    * 回车/确定按钮/失焦 触发的确认事件回调
    */
   async function confirm() {
+    removeNewItem(dataSource);
     // 如果没有输入，则直接返回
     if (!newFileName.value) return;
 
@@ -235,8 +252,6 @@ export const useFileMenu = () => {
     const data = getNewFileData(!newFileFlag.value, newFileName.value, suffix);
 
     insertNewData(data);
-
-    removeNewItem(dataSource);
 
     await nextTick();
     // 排序
@@ -312,13 +327,41 @@ export const useFileMenu = () => {
   /** 重命名 */
   async function renameFile(data: ITree) {
     closePopover();
+    // 取消其他的rename状态
     newFileFlag.value = true;
+    removeRenameItem(dataSource);
+    Reflect.set(data, "isRename", true);
+    await nextTick();
+    renameValue.value = (data as ITreeDataFile).label;
+    renameInputRef.value?.focus();
+  }
+  function renameHandle() {
+    const key = currentNodeKey.value;
+
+    const node = treeRef.value?.getNode(key) as TreeNodeData;
+
+    const path = getFullPath(dataSource as TFullData, key) as string[];
+
+    const ls = renameValue.value.split(".");
+    const suffix = ls[ls.length - 1];
+    //  获取数据
+    const data = getNewFileData(false, renameValue.value, suffix);
+    insertNewData(data);
+    // 删除节点
+    treeRef.value?.remove(node);
+    // 取消选中
+    treeRef.value?.setCurrentKey();
+    // 执行真正的 container rename 操作
+
+    const oldpath = "/" + path.join("/"); // /vite.config.ts
+    const newpath = "/" + path.slice(0, -1).join("/") + "/" + renameValue.value;
+    containerStore.rename(oldpath, newpath);
   }
 
   /** 删除 */
   async function deleteFile(data: ITree) {
     closePopover();
-    const path = getFullPath(dataSource as TFullData, data.id) as string[];
+    const path = <string[]>getFullPath(dataSource as TFullData, data.id);
     const oldpath = "/" + path.join("/");
     treeRef.value?.remove(data);
     await containerStore.deleteFile(oldpath);
@@ -348,6 +391,8 @@ export const useFileMenu = () => {
   }
 
   return {
+    renameInputRef,
+    renameValue,
     contextmenu,
     newInputRef,
     newFileName,
@@ -364,5 +409,6 @@ export const useFileMenu = () => {
     addWindowEvent,
     removeWindowEvent,
     treeNodeContextmenu,
+    renameHandle,
   };
 };
