@@ -11,6 +11,7 @@
 .el-tree-node__content i.is-leaf {
   display: none;
 }
+
 /* HTML: <div class="loader"></div> */
 .loader {
   width: 50px;

@@ -43,14 +43,7 @@ export const useFileMenu = () => {
   const newFileFlag = ref(false);
 
   /** data tree 数据源 */
-  const dataSource = reactive<ITreeData>([
-    {
-      id: "1",
-      label: "1",
-      isFolder: false,
-      suffix: "js",
-    },
-  ]);
+  const dataSource = reactive<ITreeData>([]);
 
   /** 定义 popover ref List */
   const popoverRefList = reactive<HTMLElement[]>([]);
@@ -224,10 +217,11 @@ export const useFileMenu = () => {
     removeNewItem(dataSource);
     // 如果没有输入，则直接返回
     if (!newFileName.value) return;
-    const ls = newFileName.value.split(".");
-    const suffix = ls[ls.length - 1];
+
+    const suffix = newFileName.value.split(".")[1];
     //  获取数据
     const data = getNewFileData(!newFileFlag.value, newFileName.value, suffix);
+
     insertNewData(data);
 
     await nextTick();
@@ -305,32 +299,13 @@ export const useFileMenu = () => {
   }
 
   /** 重命名 */
-  async function renameFile(data: ITree) {
-    closePopover();
-    newFileFlag.value = true;
-    // 1. 先记录当前路径
-    const path = getFullPath(dataSource as TFullData, data.id) as string[];
-    const oldpath = "/" + path.join("/");
-
-    await containerStore.deleteFile(oldpath);
-
-    // 3. 插入新的 isNew 输入框
-    treeRef.value?.insertAfter(getNewFileMockData(false), data.id);
-    // 2. 隐藏当前节点
-    treeRef.value?.remove(data);
-    await nextTick();
-    newFileName.value = (data as ITreeDataFile).label;
-    // 获取焦点
-    newInputRef.value?.focus();
+  function renameFile(data: ITree) {
+    console.log("renameFile", data);
   }
 
   /** 删除 */
-  async function deleteFile(data: ITree) {
-    closePopover();
-    const path = getFullPath(dataSource as TFullData, data.id) as string[];
-    const oldpath = "/" + path.join("/");
-    treeRef.value?.remove(data);
-    await containerStore.deleteFile(oldpath);
+  function deleteFile(data: ITree) {
+    console.log("deleteFile", data);
   }
 
   /** 初始化window事件 - 监听快捷菜单 */
