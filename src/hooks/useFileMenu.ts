@@ -160,7 +160,8 @@ export const useFileMenu = () => {
     if (currentNodeKey.value) {
       // 如果有节点被选中，则看是文件，还是文件夹，是文件-在父级添加，是文件夹-直接在当前文件夹添加
       const currentNode = treeRef.value?.getNode(currentNodeKey.value);
-      currentNode?.data.isFolder
+
+      currentNode?.data?.isFolder
         ? treeRef.value?.append(data, currentNodeKey.value)
         : treeRef.value?.insertAfter(data, currentNodeKey.value);
       // 如果没有节点被选中，则直接添加到根目录
@@ -201,6 +202,17 @@ export const useFileMenu = () => {
   }
 
   /**
+   * 节点右键事件 - 需要识别重命名文件目录层级
+   */
+  function treeNodeContextmenu(e: PointerEvent, data: ITree) {
+    e.stopPropagation();
+    closePopover();
+    removeNewItem(dataSource);
+    newFileName.value = "";
+    currentNodeKey.value = data.id;
+  }
+
+  /**
    * cancelChecked 点击树外部，需要取消所有的选中
    */
   function cancelChecked() {
@@ -214,21 +226,20 @@ export const useFileMenu = () => {
    * 回车/确定按钮/失焦 触发的确认事件回调
    */
   async function confirm() {
-    removeNewItem(dataSource);
     // 如果没有输入，则直接返回
     if (!newFileName.value) return;
 
-    const suffix = newFileName.value.split(".")[1];
+    const ls = newFileName.value.split(".");
+    const suffix = ls[ls.length - 1];
     //  获取数据
     const data = getNewFileData(!newFileFlag.value, newFileName.value, suffix);
 
     insertNewData(data);
 
+    removeNewItem(dataSource);
+
     await nextTick();
     // 排序
-    // const list = sortFile(JSON.parse(JSON.stringify(dataSource)));
-    // dataSource.length = 0;
-    // list.forEach((i) => dataSource.push(i));
 
     // 将文件/文件夹添加到container文件系统中
     mountedFileSystemTree();
@@ -299,13 +310,18 @@ export const useFileMenu = () => {
   }
 
   /** 重命名 */
-  function renameFile(data: ITree) {
-    console.log("renameFile", data);
+  async function renameFile(data: ITree) {
+    closePopover();
+    newFileFlag.value = true;
   }
 
   /** 删除 */
-  function deleteFile(data: ITree) {
-    console.log("deleteFile", data);
+  async function deleteFile(data: ITree) {
+    closePopover();
+    const path = getFullPath(dataSource as TFullData, data.id) as string[];
+    const oldpath = "/" + path.join("/");
+    treeRef.value?.remove(data);
+    await containerStore.deleteFile(oldpath);
   }
 
   /** 初始化window事件 - 监听快捷菜单 */
@@ -347,5 +363,6 @@ export const useFileMenu = () => {
     closePopover,
     addWindowEvent,
     removeWindowEvent,
+    treeNodeContextmenu,
   };
 };

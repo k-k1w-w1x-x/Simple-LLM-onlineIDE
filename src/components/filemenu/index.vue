@@ -25,7 +25,7 @@
       highlight-current
       node-key="id"
       @node-click="treeNodeClick"
-      @node-contextmenu="closePopover"
+      @node-contextmenu="treeNodeContextmenu"
       @click.self="cancelChecked"
     >
       <template #default="{ node, data }">
@@ -95,8 +95,8 @@ const {
   confirm,
   addWindowEvent,
   setPopoverRef,
-  closePopover,
   removeWindowEvent,
+  treeNodeContextmenu,
 } = useFileMenu();
 
 onMounted(addWindowEvent);

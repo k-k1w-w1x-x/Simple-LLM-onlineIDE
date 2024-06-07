@@ -93,9 +93,9 @@ export function getFullPath(
 /**
  * 获取新建文件/文件夹的 isNew data
  */
-export function getNewFileMockData(isFolder: boolean) {
+export function getNewFileMockData(isFolder: boolean, id?: string) {
   return {
-    id: Date.now().toString(),
+    id: id || Date.now().toString(),
     isFolder,
     isNew: true,
   };
