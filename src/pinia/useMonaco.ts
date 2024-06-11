@@ -44,12 +44,24 @@ export const useMonacoStore = defineStore("monaco", {
       this.editor = editor.create(dom);
       // 4. 监听事件
       this.editor.onKeyDown(this.onKeyDownHandle);
+      // 5. 监听resize
+      window.addEventListener("resize", () => {
+        this.resize();
+      });
+    },
+
+    /** 重新渲染编辑器大小 */
+    resize() {
+      nextTick(() => {
+        this.getEditor()?.layout();
+      });
     },
 
     /** 销毁editor */
     destroyEditor() {
       this.getEditor()?.dispose();
       this.editor = null;
+      window.removeEventListener("resize", this.resize);
       // this.containerStore.destroyContainer();
     },
 

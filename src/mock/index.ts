@@ -91,8 +91,41 @@ const nodeProject: TFileTree = {};
 // React 项目
 const reactProject: TFileTree = {};
 
+// File Menu Tree Data
+const fileMenuTreeData = [
+  {
+    id: "src",
+    label: "src",
+    isFolder: true,
+    children: [],
+  },
+
+  {
+    id: "index.html",
+    label: "index.html",
+    suffix: "html",
+    isFolder: false,
+    icon: "http://localhost:3000/src/assets/fileIcon/html.svg",
+  },
+  {
+    id: "package.json",
+    label: "package.json",
+    suffix: "json",
+    isFolder: false,
+    icon: "http://localhost:3000/src/assets/fileIcon/json.svg",
+  },
+  {
+    id: "vite.config.js",
+    label: "vite.config.js",
+    suffix: "js",
+    isFolder: false,
+    icon: "http://localhost:3000/src/assets/fileIcon/js.svg",
+  },
+];
+
 export const mock = {
   vueProject,
   nodeProject,
   reactProject,
+  fileMenuTreeData,
 };

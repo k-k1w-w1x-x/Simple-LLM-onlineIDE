@@ -44,7 +44,7 @@ export const useFileMenu = () => {
   const newFileFlag = ref(false);
 
   /** data tree 数据源 */
-  const dataSource = reactive<ITreeData>([]);
+  const dataSource = reactive<ITreeData>(mock.fileMenuTreeData);
 
   /** 定义 popover ref List */
   const popoverRefList = reactive<HTMLElement[]>([]);
@@ -52,6 +52,9 @@ export const useFileMenu = () => {
   /** 重命名 */
   const renameInputRef = ref<HTMLInputElement | null>(null);
   const renameValue = ref("");
+
+  /** 文件拖拽 oldpath 中转 */
+  const oldPath = ref("");
 
   /** 定义文件右键菜单列表 */
   const contextmenu: TFileMenu[] = [
@@ -228,6 +231,60 @@ export const useFileMenu = () => {
     currentNodeKey.value = data.id;
   }
 
+  function allowDrop(
+    draggingNode: TreeNodeData,
+    dropNode: TreeNodeData,
+    type: string
+  ) {
+    // 两个不同文件夹下的文件拖拽 after before 是被允许的
+    // 1. 获取 draggingNode 的文件夹
+    const draggingNodeParent = draggingNode.parent?.key;
+
+    const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
+    const path = <string[]>getFullPath(dataMap, draggingNode.key);
+    const oldpath = "/" + path.join("/");
+    oldPath.value = "";
+    // 2. 获取 dropNode 的文件夹
+    const dropNodeParent = dropNode.parent?.key;
+    if (draggingNodeParent !== dropNodeParent) {
+      // 不同文件夹的情况下，也需要禁止拖拽到文件内
+      if (dropNode.data.isFolder || type !== "inner")
+        return (oldPath.value = oldpath);
+    } else {
+      // 只需要判断 inner 的情况，因为 在 vocode 中，同一个文件夹内的文件拖拽顺序是无法调整的，因为该顺序按照 文件名默认排序
+      if (type !== "inner") return false;
+      // 如果目标节点是文件夹，则允许拖拽
+      if (dropNode.data.isFolder) return (oldPath.value = oldpath);
+    }
+  }
+
+  /**
+   * 节点拖拽事件 -
+   *  1. 需要在拖拽结束后，判断释放合理性，不能将文件拖拽到文件内
+   *  2. 拖拽到文件夹下，则直接插入到文件夹下
+   *  3. 还需要在拖拽结束后，修改 container 位置
+   *  4. 在 vocode 中，同一个文件夹内的文件拖拽顺序是无法调整的，因为该顺序按照 文件名默认排序
+   *
+   * @param cnode 当前被拖拽的节点
+   * @param tnone 拖拽释放目标节点
+   * @param pos 被拖拽节点的放置位置 before、after、inner
+   * @param event 拖拽事件源
+   */
+  function nodeDrop(cnode: TreeNodeData) {
+    const dataMap = JSON.parse(JSON.stringify(dataSource)) as TFullData;
+    // 1. 获取当前拖拽的文件的oldpath
+    const path = <string[]>getFullPath(dataMap, cnode.key);
+    const newpath = "/" + path.join("/");
+    const oldpath = oldPath.value || `/${cnode.data.id}`;
+
+    containerStore.rename(oldpath, newpath);
+    console.group("拖拽成功事件");
+    console.log("cnode", cnode);
+    console.log("newpath", newpath);
+    console.log("oldpath", oldpath);
+    console.groupEnd();
+  }
+
   /**
    * cancelChecked 点击树外部，需要取消所有的选中
    */
@@ -367,6 +424,7 @@ export const useFileMenu = () => {
     await containerStore.deleteFile(oldpath);
   }
 
+  /** 节点拖拽需要判断节点拖拽后释放的合理性，不能文件放在文件下！ */
   /** 初始化window事件 - 监听快捷菜单 */
   function addWindowEvent() {
     window.addEventListener("keydown", eventHandle);
@@ -374,6 +432,7 @@ export const useFileMenu = () => {
   function removeWindowEvent() {
     window.removeEventListener("keydown", eventHandle);
   }
+  /** 快捷键事件响应中心 */
   function eventHandle(e: KeyboardEvent) {
     const { ctrlKey, keyCode } = e;
 
@@ -410,5 +469,7 @@ export const useFileMenu = () => {
     removeWindowEvent,
     treeNodeContextmenu,
     renameHandle,
+    nodeDrop,
+    allowDrop,
   };
 };

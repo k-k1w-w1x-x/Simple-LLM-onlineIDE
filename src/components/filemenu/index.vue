@@ -11,7 +11,7 @@
         :class="i"
       />
       <el-popover placement="top-end" :show-arrow="false" trigger="hover">
-        <div class="opts">123</div>
+        <div class="opts">menu item</div>
         <template #reference>
           <i class="iconfont icon-gengduo"> </i>
         </template>
@@ -24,6 +24,9 @@
       :data="dataSource"
       highlight-current
       node-key="id"
+      draggable
+      :allow-drop="allowDrop"
+      @node-drop="nodeDrop"
       @node-click="treeNodeClick"
       @node-contextmenu="treeNodeContextmenu"
       @click.self="cancelChecked"
@@ -43,6 +46,7 @@
             "
           />
         </template>
+        <!--  重命名实现 需要加单独的输入框 -->
         <template v-else-if="data.isRename">
           <el-input
             ref="renameInputRef"
@@ -110,6 +114,8 @@ const {
   removeWindowEvent,
   treeNodeContextmenu,
   renameHandle,
+  nodeDrop,
+  allowDrop,
 } = useFileMenu();
 
 onMounted(addWindowEvent);
