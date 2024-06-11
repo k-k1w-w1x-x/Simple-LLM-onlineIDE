@@ -1,0 +1,14 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Element-plus 样式穿透 */
+.el-tree-node__content img {
+  height: 100%;
+}
+
+.el-tree-node__content i.is-leaf {
+  display: none;
+}

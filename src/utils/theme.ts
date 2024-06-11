@@ -1,7 +1,3 @@
-// config/thene/light.css
-// config/thene/dark.css
-import "../config/theme/dark.css";
-import "../config/theme/light.css";
 export function setTheme(theme: string) {
   // terminal 主题切换的实现思路是通过切换 css 变量
   // 1. 设置html 属性
