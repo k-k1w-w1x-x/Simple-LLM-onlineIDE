@@ -19,8 +19,7 @@ const vueProject: TFileTree = {
     directory: {
       "main.js": {
         file: {
-          contents: `
-import { createApp } from "vue";
+          contents: `import { createApp } from "vue";
 
 import App from "./App.vue";
 
@@ -36,8 +35,7 @@ createApp(App).mount("#app");`,
   },
   "index.html": {
     file: {
-      contents: `
-<!DOCTYPE html>
+      contents: `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -58,8 +56,7 @@ createApp(App).mount("#app");`,
   },
   "package.json": {
     file: {
-      contents: `
-{
+      contents: `{
     "name": "demo",
     "scripts": {
         "dev": "vite"
@@ -77,8 +74,7 @@ createApp(App).mount("#app");`,
   },
   "vite.config.js": {
     file: {
-      contents: `
-import { defineConfig } from "vite";
+      contents: `import { defineConfig } from "vite";
 
 import vue from "@vitejs/plugin-vue";
 
@@ -95,8 +91,41 @@ const nodeProject: TFileTree = {};
 // React 项目
 const reactProject: TFileTree = {};
 
+// File Menu Tree Data
+const fileMenuTreeData = [
+  {
+    id: "src",
+    label: "src",
+    isFolder: true,
+    children: [],
+  },
+
+  {
+    id: "index.html",
+    label: "index.html",
+    suffix: "html",
+    isFolder: false,
+    icon: "http://localhost:3000/src/assets/fileIcon/html.svg",
+  },
+  {
+    id: "package.json",
+    label: "package.json",
+    suffix: "json",
+    isFolder: false,
+    icon: "http://localhost:3000/src/assets/fileIcon/json.svg",
+  },
+  {
+    id: "vite.config.js",
+    label: "vite.config.js",
+    suffix: "js",
+    isFolder: false,
+    icon: "http://localhost:3000/src/assets/fileIcon/js.svg",
+  },
+];
+
 export const mock = {
   vueProject,
   nodeProject,
   reactProject,
+  fileMenuTreeData,
 };

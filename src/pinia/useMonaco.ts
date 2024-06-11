@@ -3,7 +3,12 @@ import { defineStore } from "pinia";
 import { editor, languages } from "monaco-editor";
 import { fixEnvError } from "../utils/monaco.ts";
 import { nextTick, toRaw } from "vue";
-import { TFileStateMap, TKeyMap, voidFun } from "../type/index.ts";
+import {
+  TEditorEvent,
+  TEditorStateMap,
+  TKeyMap,
+  voidFun,
+} from "../type/index.ts";
 import { useContainerStore } from "./useContainer.ts";
 import { ITreeDataFile, TFullData } from "../type/fileMenu.ts";
 import { useFileMenuStore } from "./useFileMenu.ts";
@@ -12,10 +17,10 @@ import { getFullPath } from "../utils/index.ts";
 export const useMonacoStore = defineStore("monaco", {
   state: () => {
     return {
-      selector: ".monaco-box-container",
-      languages: <languages.ILanguageExtensionPoint[]>[],
+      selector: ".monaco-box-container", // 暂时是这样的
+      languages: <languages.ILanguageExtensionPoint[]>[], // 支持的语言
       editor: <editor.IStandaloneCodeEditor | null>null,
-      fileStateMap: <TFileStateMap>new Map(), // 1. 关键参数 map
+      editorStateMap: <TEditorStateMap>new Map(), // 1. 关键参数 map
       fileList: <ITreeDataFile[]>[], // 定义当前文件列表 - 实现 tab 切换
       currentFileID: "", // 当前文件ID
       containerStore: useContainerStore(),
@@ -29,7 +34,7 @@ export const useMonacoStore = defineStore("monaco", {
      */
     initEditor() {
       if (this.editor) return;
-      this.fileStateMap.clear();
+      this.editorStateMap.clear();
       // 1. 修复worker 异常问题
       fixEnvError();
       // 2. 创建 editor 实例
@@ -39,12 +44,24 @@ export const useMonacoStore = defineStore("monaco", {
       this.editor = editor.create(dom);
       // 4. 监听事件
       this.editor.onKeyDown(this.onKeyDownHandle);
+      // 5. 监听resize
+      window.addEventListener("resize", () => {
+        this.resize();
+      });
     },
 
-    // 销毁editor
+    /** 重新渲染编辑器大小 */
+    resize() {
+      nextTick(() => {
+        this.getEditor()?.layout();
+      });
+    },
+
+    /** 销毁editor */
     destroyEditor() {
       this.getEditor()?.dispose();
       this.editor = null;
+      window.removeEventListener("resize", this.resize);
       // this.containerStore.destroyContainer();
     },
 
@@ -105,7 +122,7 @@ export const useMonacoStore = defineStore("monaco", {
      *   4. createModel、getModel、setModel
      */
     //  添加文件到monaco编辑区
-    async addFile(file: ITreeDataFile) {
+    async openFile(file: ITreeDataFile) {
       // 判断文件列表是否已经存在，存在则直接跳转到该文件即可
       if (!this.fileList.find((i) => i.id === file.id)) {
         // 添加文件到列表
@@ -146,7 +163,7 @@ export const useMonacoStore = defineStore("monaco", {
       // 3. 保存
       await this.containerStore.writeFile(path, value as string);
       // 删除 stateMap
-      this.fileStateMap.delete(id);
+      this.editorStateMap.delete(id);
       // 关闭 editor
       if (!this.fileList.length) return this.destroyEditor();
       //  更新index - 取第一个
@@ -163,46 +180,37 @@ export const useMonacoStore = defineStore("monaco", {
       this.currentFileID = id;
 
       // 3. 看看跳转后文件时候有 model 有的话直接使用，没有就创建新的
-      const file = this.fileStateMap.get(id);
+      const file = this.editorStateMap.get(id);
 
       if (file && file.model) {
-        console.log("有map");
         this.setModel(toRaw(file.model));
         this.restoreViewState(toRaw(file.state)); // 恢复文件的编辑状态
       } else {
-        console.log("无map");
         // 2. 读取文件内容赋给monaco
-        const contents = await this.containerStore.readFile(
-          this.getFilePath(id)
-        );
-
+        const path = this.getFilePath(id);
+        const contents = await this.containerStore.readFile(path);
+        // 创建语言模型
         const model = this.createModel(
           contents || "",
           this.getLanguageModel(fileSuffix)?.id as string
         );
-
+        // 设置语言模型
         this.setModel(model);
-
-        this.fileStateMap.set(id, {
-          model: this.getModel() as editor.ITextModel,
-          state: this.saveViewState() as editor.ICodeEditorViewState,
-        });
+        // 保存当前文件的状态，以便后续再次打开时，直接加载状态即可
+        const newmodel = this.getModel() as editor.ITextModel;
+        const state = this.saveViewState() as editor.ICodeEditorViewState;
+        this.editorStateMap.set(id, { model: newmodel, state });
       }
-      this.getEditor()?.focus();
     },
 
     // keyDown 事件回调
-    onKeyDownHandle(e: {
-      keyCode: number;
-      ctrlKey: boolean;
-      shiftKey: boolean;
-      altKey: boolean;
-      browserEvent: { preventDefault: () => void };
-    }) {
+    onKeyDownHandle(e: TEditorEvent) {
       // 通过keycode/ctrlKey/shiftKey/altKey 的状态唯一确定一个事件- 有值为true，无值为false
       const eventMap: TKeyMap<string, voidFun> = {
-        "49/true/false/false": this.eventSave, // Ctrl + S
+        "49/true/false/false": this.saveHandle, // Ctrl + S
+        // Ctrl + W 关闭当前文件
       };
+
       const key = `${e.keyCode}/${e.ctrlKey}/${e.shiftKey}/${e.altKey}`;
 
       if (eventMap[key]) {
@@ -212,15 +220,12 @@ export const useMonacoStore = defineStore("monaco", {
     },
 
     // Ctrl S
-    async eventSave() {
+    async saveHandle() {
       // 1. 获取当前编辑器的内容-因为支持多tab 不能直接取当前，应该取当前的id对应的内容
       const contents = this.getEditor()?.getValue() as string;
-
+      const path = this.getFilePath(this.currentFileID);
       // 2. 调用 container 的 saveFile 方法
-      await this.containerStore.writeFile(
-        this.getFilePath(this.currentFileID),
-        contents
-      );
+      await this.containerStore.writeFile(path, contents);
     },
   },
 });

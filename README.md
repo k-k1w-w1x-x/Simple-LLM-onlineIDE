@@ -1,6 +1,6 @@
 ![logo](./public/logo.svg)
 
-# Web IDE 在线代码编辑器
+# Unicode-IDE 在线代码编辑器
 
 
 
@@ -23,6 +23,32 @@
 ​	而Monaco Editor则是从web Container中的文件关系进行文件读取编辑，保存后重新回写到Container中。
 
 
+## 运行环境
+
+- Node.js 18.x
+- Vue.js 3.x
+- Pnpm 8.x
+- Vite 5.x
+- Typescript 5.x
+- Eslint 9.x
+
+```shell
+
+  ##  克隆仓库
+  git clone https://gitee.com/wfeng0/unicode-ide.git
+  
+  ##  推荐使用pnpm进行依赖管理
+  pnpm install
+  
+  ##  本地运行
+  pnpm run dev
+
+  ##  如果提交代码，请先执行 lint 与 build 命令进行代码检查与打包 ，确认没错误后再提交。
+  pnpm run lint
+
+  pnpm run build
+
+```
 
 ## 整体效果
 
@@ -50,12 +76,13 @@
 - 文件重命名、删除文件、拖拽更换文件位置
 - 支持系统设置-可调整文件显示模式、主题切换
 - 插件系统
+- makrdown preview
 
 
 
 ## 联系交流
 
-如果对项目优化或功能有好的想法并乐意贡献代码欢迎提交[PR](https://gitee.com/wfeng0/web-ide/pulls) ，对项目使用存在疑问或发现bug请提交[issue](https://gitee.com/wfeng0/web-ide/issues)。
+如果对项目优化或功能有好的想法并乐意贡献代码欢迎提交[PR](https://gitee.com/wfeng0/unicode-ide/pulls) ，对项目使用存在疑问或发现bug请提交[issue](https://gitee.com/wfeng0/unicode-ide/issues)。
 
 欢迎大家加入QQ群，不限于Socket.IO、前端技术、Node等，都可以进行沟通交流哦~
 

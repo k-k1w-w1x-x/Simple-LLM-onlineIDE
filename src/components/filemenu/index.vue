@@ -1,5 +1,6 @@
 <template>
   <div class="file-menu">
+    <!-- 顶部 添加按钮 -->
     <div class="file-menu-icons">
       <img src="../../assets/logo.svg" alt="" />
       <i
@@ -9,13 +10,12 @@
         class="iconfont"
         :class="i"
       />
-      <i class="iconfont icon-gengduo">
-        <div class="more">
-          <span @click="initVueProject">init Vue</span>
-          <span>Open Folder</span>
-          <span>npm script</span>
-        </div>
-      </i>
+      <el-popover placement="top-end" :show-arrow="false" trigger="hover">
+        <div class="opts">menu item</div>
+        <template #reference>
+          <i class="iconfont icon-gengduo"> </i>
+        </template>
+      </el-popover>
     </div>
 
     <!-- 文件树 -->
@@ -24,7 +24,11 @@
       :data="dataSource"
       highlight-current
       node-key="id"
-      @node-click="nodeClick"
+      draggable
+      :allow-drop="allowDrop"
+      @node-drop="nodeDrop"
+      @node-click="treeNodeClick"
+      @node-contextmenu="treeNodeContextmenu"
       @click.self="cancelChecked"
     >
       <template #default="{ node, data }">
@@ -33,7 +37,7 @@
           <el-input
             ref="newInputRef"
             @blur="confirm"
-            @keydown.enter="newFileEnter"
+            @keydown.enter="newInputRef?.blur()"
             v-model="newFileName"
             :prefix-icon="data.isFolder ? FolderOpened : Document"
             size="small"
@@ -42,15 +46,45 @@
             "
           />
         </template>
+        <!--  重命名实现 需要加单独的输入框 -->
+        <template v-else-if="data.isRename">
+          <el-input
+            ref="renameInputRef"
+            @blur="renameHandle"
+            @keydown.enter="renameInputRef?.blur()"
+            :prefix-icon="Document"
+            v-model="renameValue"
+            size="small"
+          />
+        </template>
+        <!-- 正常的文件展示 -->
         <template v-else>
-          <div class="tree-item">
-            <img v-if="data.icon && !data.isFolder" :src="data.icon" alt="" />
-            {{ node.label }}
-            <div class="opts">
-              <i @click="menuClick(3)" class="iconfont icon-rename"></i>
-              <i @click="menuClick(4)" class="iconfont icon-shanchu1"></i>
+          <el-popover
+            :ref="setPopoverRef"
+            width="220"
+            placement="bottom-start"
+            trigger="contextmenu"
+            :show-arrow="false"
+            :hide-after="0"
+          >
+            <!-- 右键文件位置 -->
+            <div class="filemenu-contextmenu">
+              <div
+                v-for="menu in contextmenu"
+                :key="menu.label"
+                @click="menu.callback(data)"
+              >
+                <span>{{ menu.label }}</span>
+                <span>{{ menu.shortcut }}</span>
+              </div>
             </div>
-          </div>
+            <template #reference>
+              <div class="tree-item">
+                <img v-if="data.icon && !data.isFolder" :src="data.icon" />
+                {{ node.label }}
+              </div>
+            </template>
+          </el-popover>
         </template>
       </template>
     </el-tree>
@@ -58,36 +92,39 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
 import { useFileMenu } from "../../hooks/useFileMenu";
 import { Document, FolderOpened } from "@element-plus/icons-vue";
+import { icons } from "../../config/index.ts";
+import { onBeforeMount, onMounted } from "vue";
 
 const {
+  renameInputRef,
+  renameValue,
+  contextmenu,
   newInputRef,
   newFileName,
-  icons,
   treeRef,
   dataSource,
   menuClick,
-  nodeClick,
+  treeNodeClick,
   cancelChecked,
   confirm,
-  newFileEnter,
-  initVueProject,
+  addWindowEvent,
+  setPopoverRef,
+  removeWindowEvent,
+  treeNodeContextmenu,
+  renameHandle,
+  nodeDrop,
+  allowDrop,
 } = useFileMenu();
-import { useContainerStore } from "../../pinia/useContainer";
-const containerStore = useContainerStore();
 
-// demo
-watch(
-  () => containerStore.boot,
-  () => initVueProject(),
-  { immediate: false }
-);
+onMounted(addWindowEvent);
+onBeforeMount(removeWindowEvent);
 </script>
 
 <style lang="less" scoped>
 .file-menu {
+  position: relative;
   width: 220px;
   border-right: solid #ccc 1px;
   padding: 10px;
@@ -122,45 +159,32 @@ watch(
   height: calc(100% - 20px - 35px);
 }
 
-.more {
-  background-color: #fff;
-  border: solid rgba(204, 204, 204, 0.4) 1px;
-  z-index: 999;
-  position: absolute;
-  right: 0;
-  top: 25px;
-  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  display: none;
-  flex-direction: column;
-  span {
-    margin: 4px 0;
-    padding: 4px 8px;
-    cursor: pointer;
-    &:hover {
-      background-color: #ccc;
-    }
-  }
-}
-
-.icon-gengduo:hover .more {
-  display: flex !important;
-}
 .tree-item {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
-  &:hover {
-    .opts {
-      display: block;
+}
+
+.filemenu-contextmenu {
+  width: 100%;
+  div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 4px 0;
+    cursor: pointer;
+    &:hover {
+      background-color: #f2f3f5;
     }
-  }
-  .opts {
-    display: none;
-    margin-left: auto;
-    i {
-      margin-left: 6px;
+    span:nth-child(1) {
+      font-weight: 600;
+    }
+    span:nth-child(2) {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.5);
     }
   }
 }
