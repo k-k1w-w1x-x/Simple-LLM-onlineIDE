@@ -1,8 +1,11 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4568361 */
-  src: url('//at.alicdn.com/t/c/font_4568361_w4axl6nf3k.woff2?t=1717551656830') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4568361_w4axl6nf3k.woff?t=1717551656830') format('woff'),
-       url('//at.alicdn.com/t/c/font_4568361_w4axl6nf3k.ttf?t=1717551656830') format('truetype');
+  src: url("//at.alicdn.com/t/c/font_4568361_bez4xed063.woff2?t=1718241516090")
+      format("woff2"),
+    url("//at.alicdn.com/t/c/font_4568361_bez4xed063.woff?t=1718241516090")
+      format("woff"),
+    url("//at.alicdn.com/t/c/font_4568361_bez4xed063.ttf?t=1718241516090")
+      format("truetype");
 }
 
 .iconfont {
@@ -11,6 +14,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-operate_ic_source:before {
+  content: "\e612";
+}
+
+.icon-shezhi:before {
+  content: "\e600";
+}
+
+.icon-yonghu-yuan:before {
+  content: "\e624";
+}
+
+.icon-wenjian1:before {
+  content: "\e631";
+}
+
+.icon-sousuo:before {
+  content: "\e8b9";
 }
 
 .icon-CodeSandbox:before {
