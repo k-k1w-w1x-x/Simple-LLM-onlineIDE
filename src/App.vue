@@ -1,7 +1,13 @@
 <template>
   <div class="web-ide-editor-box">
     <div class="web-ide-editor-box-opts">
-      <i v-for="icon in optsIcon" :key="icon" class="iconfont" :class="icon" />
+      <i
+        v-for="icon in optsIcon"
+        :key="icon"
+        @click="menuClick(icon)"
+        class="iconfont"
+        :class="icon"
+      />
     </div>
     <!-- 左侧文件菜单 -->
     <fileMenu />
@@ -16,7 +22,16 @@
     </div>
 
     <el-drawer v-model="drawer" title="系统设置">
-      <span>Hi there!</span>
+      <el-form>
+        <el-form-item label="主题">
+          <el-button type="primary" size="small" @click="triggerTheme('dark')">
+            Dark
+          </el-button>
+          <el-button size="small" @click="triggerTheme('light')" plain>
+            Light
+          </el-button>
+        </el-form-item>
+      </el-form>
     </el-drawer>
 
     <!-- loading -->
@@ -39,14 +54,30 @@ import { useContainerStore } from "./pinia/useContainer";
 import { useLoading } from "./hooks/useLoading";
 import { optsIcon } from "./config/index";
 import { ref } from "vue";
+import { TKeyMap, voidFun } from "./type";
+import { setTheme } from "./utils/theme";
+import { useMonacoStore } from "./pinia/useMonaco";
 const { message, bootedFlag, checkBooted } = useLoading();
 const containerStore = useContainerStore();
+const monacoStore = useMonacoStore();
 // 1. 执行boot 操作
 containerStore.bootContainer();
 // 2. 定时检测容器挂载状态
 checkBooted();
 
 const drawer = ref(false);
+
+function menuClick(icon: string) {
+  const eventMap: TKeyMap<string, voidFun> = {
+    "icon-shezhi": () => (drawer.value = true),
+  };
+  eventMap[icon] && eventMap[icon]();
+}
+
+function triggerTheme(theme: string) {
+  setTheme(theme);
+  monacoStore.setTheme(theme);
+}
 </script>
 
 <style lang="less" scoped>
@@ -57,6 +88,8 @@ const drawer = ref(false);
   overflow: hidden;
   display: flex;
   &-opts {
+    background-color: var(--t-main-background-color);
+    color: var(--t-main-font-color);
     padding: 20px 0;
     width: 40px;
     border-right: solid #ccc 1px;

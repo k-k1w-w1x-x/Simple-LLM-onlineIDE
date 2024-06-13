@@ -36,6 +36,8 @@ window.addEventListener("mouseup", async (e: MouseEvent) => {
 .monaco-box {
   flex: 1;
   border-right: solid #ccc 1px;
+  background-color: var(--t-main-background-color);
+  color: var(--t-main-font-color);
   &-bar {
     border-bottom: solid #ccc 1px;
     box-sizing: content-box;

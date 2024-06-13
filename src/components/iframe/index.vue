@@ -16,8 +16,10 @@ const containerStore = useContainerStore();
 <style lang="less" scoped>
 .iframe {
   flex: 1;
+  background-color: var(--t-main-background-color);
 }
 iframe {
+  background-color: #fff;
   height: 100%;
   width: 100%;
 }

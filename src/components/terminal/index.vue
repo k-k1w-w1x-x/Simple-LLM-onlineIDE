@@ -15,6 +15,7 @@ import terminal from "./components/vue-web-terminal.vue";
 
 <style lang="less" scoped>
 .terminal {
+  background-color: var(--t-main-background-color);
   height: 180px;
   border-top: solid #ccc 1px;
   &-tabs {
@@ -28,7 +29,7 @@ import terminal from "./components/vue-web-terminal.vue";
       margin: 0 8px;
     }
   }
-  &-list{
+  &-list {
     padding-bottom: 10px;
   }
 }

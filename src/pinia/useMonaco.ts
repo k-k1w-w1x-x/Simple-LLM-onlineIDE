@@ -48,6 +48,9 @@ export const useMonacoStore = defineStore("monaco", {
       window.addEventListener("resize", () => {
         this.resize();
       });
+      // 6. 决定用什么主题是由 html 的 data-theme 属性决定
+      const theme = document.documentElement.getAttribute("data-theme");
+      this.setTheme(theme as string);
     },
 
     /** 重新渲染编辑器大小 */
@@ -75,6 +78,17 @@ export const useMonacoStore = defineStore("monaco", {
     /** 为了避免Vue响应式对编辑器的影响，使用toRaw转成普通对象 */
     getEditor() {
       return toRaw(this.editor);
+    },
+
+    /** 设置主题 */
+    setTheme(theme: string) {
+      // 做主题映射
+      const themeMap: TKeyMap<string, string> = {
+        dark: "vs-dark",
+        light: "vs",
+      };
+      // vs， vs-dark，hc-black
+      editor.setTheme(themeMap[theme]);
     },
 
     /** 设置编辑器的值 + 设置语言模型 */

@@ -40,4 +40,6 @@
   );
   --t-json-deep-selector-border-color: rgb(249 249 249 / 52%);
   --t-code-default-background-color: rgb(227 239 248);
+  /* 自定义El-tree hover样式 */
+  --t-main-el-tree-hover-color: #f5f7fa;
 }
