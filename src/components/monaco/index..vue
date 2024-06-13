@@ -10,7 +10,7 @@
         :key="index"
         :class="{ active: monacoStore.currentFileID === file.id }"
       >
-        {{ file?.label }}
+        <img :src="file.icon" alt="" /> {{ file?.label }}
       </span>
     </div>
     <div class="monaco-box-container" v-if="monacoStore.fileList.length"></div>
@@ -36,14 +36,22 @@ window.addEventListener("mouseup", async (e: MouseEvent) => {
 .monaco-box {
   flex: 1;
   border-right: solid #ccc 1px;
+  background-color: var(--t-main-background-color);
+  color: var(--t-main-font-color);
   &-bar {
     border-bottom: solid #ccc 1px;
     box-sizing: content-box;
-    height: 20px;
+    height: 40px;
     padding: 5px 10px 0 10px;
     display: flex;
     align-items: center;
+    img {
+      height: 70%;
+    }
     span {
+      display: flex;
+      align-items: center;
+      height: 100%;
       padding: 0 5px 4px 5px;
       cursor: pointer;
       font-size: 12px;

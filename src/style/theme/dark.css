@@ -1,6 +1,6 @@
 :root[data-theme="dark"] {
-  --t-main-background-color: #191b24;
-  --t-main-font-color: #fff;
+  --t-main-background-color: #1e1e1e;
+  --t-main-font-color: #ffffff;
   --t-window-box-shadow: 0 0 40px 1px rgb(0 0 0 / 20%);
   --t-header-background-color: #959598;
   --t-header-font-color: white;
@@ -40,6 +40,8 @@
   );
   --t-json-deep-selector-border-color: rgb(249 249 249 / 52%);
   --t-code-default-background-color: rgb(39 50 58);
+  /* 自定义El-tree hover样式 */
+  --t-main-el-tree-hover-color: rgba(255, 255, 255, 0.3);
 }
 
 .t-header-pin:hover {

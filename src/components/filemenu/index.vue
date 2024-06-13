@@ -124,6 +124,8 @@ onBeforeMount(removeWindowEvent);
 
 <style lang="less" scoped>
 .file-menu {
+  background-color: var(--t-main-background-color);
+  color: var(--t-main-font-color);
   position: relative;
   width: 220px;
   border-right: solid #ccc 1px;
@@ -131,7 +133,7 @@ onBeforeMount(removeWindowEvent);
   &-icons {
     position: relative;
     box-sizing: content-box;
-    height: 24px;
+    height: 25px;
     display: flex;
     align-items: center;
     justify-content: flex-end;

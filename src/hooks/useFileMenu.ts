@@ -43,8 +43,8 @@ export const useFileMenu = () => {
   /** 新建文件标志 true ：文件  false ：文件夹 */
   const newFileFlag = ref(false);
 
-  /** data tree 数据源 */
-  const dataSource = reactive<ITreeData>(mock.fileMenuTreeData);
+  /** data tree 数据源 mock.fileMenuTreeData */
+  const dataSource = reactive<ITreeData>([]);
 
   /** 定义 popover ref List */
   const popoverRefList = reactive<HTMLElement[]>([]);
