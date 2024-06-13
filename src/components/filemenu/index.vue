@@ -131,7 +131,7 @@ onBeforeMount(removeWindowEvent);
   &-icons {
     position: relative;
     box-sizing: content-box;
-    height: 24px;
+    height: 25px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
