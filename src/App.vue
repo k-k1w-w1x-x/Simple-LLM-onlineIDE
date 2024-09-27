@@ -24,10 +24,19 @@
     <el-drawer v-model="drawer" title="系统设置">
       <el-form>
         <el-form-item label="主题">
-          <el-button type="primary" size="small" @click="triggerTheme('dark')">
+          <el-button
+            :type="theme === 'dark' ? 'primary' : ''"
+            size="small"
+            @click="triggerTheme('dark')"
+          >
             Dark
           </el-button>
-          <el-button size="small" @click="triggerTheme('light')" plain>
+
+          <el-button
+            :type="theme === 'light' ? 'primary' : ''"
+            size="small"
+            @click="triggerTheme('light')"
+          >
             Light
           </el-button>
         </el-form-item>
@@ -35,13 +44,13 @@
     </el-drawer>
 
     <!-- loading -->
-    <!-- <div class="loading" v-if="!containerStore.boot">
+    <div class="loading" v-if="!containerStore.boot">
       <div class="loader" v-if="!bootedFlag" />
       <span :class="{ error: bootedFlag }">
         <span v-if="bootedFlag">⛔</span>
         {{ message }}
       </span>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -66,6 +75,7 @@ containerStore.bootContainer();
 checkBooted();
 
 const drawer = ref(false);
+const theme = ref("light");
 
 function menuClick(icon: string) {
   const eventMap: TKeyMap<string, voidFun> = {
@@ -74,9 +84,10 @@ function menuClick(icon: string) {
   eventMap[icon] && eventMap[icon]();
 }
 
-function triggerTheme(theme: string) {
-  setTheme(theme);
-  monacoStore.setTheme(theme);
+function triggerTheme(t: string) {
+  setTheme(t);
+  monacoStore.setTheme(t);
+  theme.value = t;
 }
 </script>
 

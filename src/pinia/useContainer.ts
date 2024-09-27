@@ -26,11 +26,18 @@ export const useContainerStore = defineStore("container", {
       stdout.output.pipeTo(
         new WritableStream({
           write(data) {
-            fun(data);
+            const encoder = new TextEncoder();
+            const encodedData = encoder.encode(data);
+            // 如果函数需要 ArrayBuffer，可以从 Uint8Array 获取它
+            const buffer: ArrayBuffer = encodedData.buffer;
+            const decoder = new TextDecoder('utf-8'); // 使用 UTF-8 解码器处理数据流
+            const text = decoder.decode(buffer, { stream: true }); // 将数据流解码为文本
+            fun(text); // 传递解码后的文本
           },
         })
       );
     },
+
 
     /**
      * 设置 Container 挂载的文件树
