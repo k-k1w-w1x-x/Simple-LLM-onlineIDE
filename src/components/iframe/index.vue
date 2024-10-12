@@ -24,17 +24,15 @@ export default {
 .container {
   flex: 1;
   background-color: var(--t-main-background-color);
-  height: 100%;
-  width: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .iframe, .chat-component {
   flex: 1;
   width: 100%;
-  height: 100%;
-  overflow: hidden; // 防止内容溢出
+  overflow: hidden;
 }
 
 .iframe {

@@ -121,9 +121,11 @@ function triggerTheme(t: string) {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     &-top {
-      flex: auto;
+      flex: 1;
       display: flex;
+      overflow: hidden;
     }
   }
 }
