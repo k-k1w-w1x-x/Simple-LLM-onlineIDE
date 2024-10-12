@@ -3,7 +3,8 @@
     <div class="messages-container">
       <div v-for="(msg, index) in messages" :key="index" class="message-wrapper">
         <div :class="['message', msg.from === 'user' ? 'user-message' : 'bot-message']">
-          {{ msg.text }}
+          <div v-if="msg.from === 'bot'" v-html="renderMarkdown(msg.text)" />
+          <div v-else>{{ msg.text }}</div>
         </div>
       </div>
     </div>
@@ -15,15 +16,22 @@
   </div>
 </template>
 
+
 <script>
+import MarkdownIt from 'markdown-it'
+
 export default {
   data() {
     return {
       userInput: '',
       messages: [],
+      md: new MarkdownIt()
     };
   },
   methods: {
+    renderMarkdown(text) {
+      return this.md.render(text)
+    },
     async sendMessage() {
       if (!this.userInput) return;
   
@@ -40,7 +48,7 @@ export default {
       this.userInput = '';
     },
     async getBotResponse(userMessage) {
-      const response = await fetch('http://localhost:3000/api/chat', {
+      const response = await fetch('http://localhost:3001/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,21 +83,17 @@ export default {
 
 <style scoped>
 .chat-container {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 20px;
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .messages-container {
-  flex-grow: 1;
+  flex: 1;
   overflow-y: auto;
-  margin-bottom: 20px;
-  padding-right: 10px;
+  padding: 20px;
 }
 
 .message-wrapper {
@@ -102,6 +106,7 @@ export default {
   border-radius: 18px;
   line-height: 1.4;
   word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .user-message {
@@ -121,11 +126,13 @@ export default {
 
 .input-group {
   display: flex;
-  gap: 10px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
 }
 
 textarea {
-  flex-grow: 1;
+  flex: 1;
   min-height: 40px;
   max-height: 120px;
   resize: none;
@@ -136,6 +143,7 @@ textarea {
 }
 
 button {
+  margin-left: 10px;
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
