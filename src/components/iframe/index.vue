@@ -3,8 +3,8 @@
     <div class="toggle-button" @click="toggleView">
       {{ showIframe ? '切换到聊天' : '切换到 iframe' }}
     </div>
-    <iframe v-if="showIframe" :src="containerStore.url" frameborder="0" class="iframe" />
-    <chat-component v-else class="chat-component" />
+    <iframe v-show="showIframe" :src="containerStore.url" frameborder="0" class="iframe" />
+    <chat-component v-show="!showIframe" class="chat-component" />
   </div>
 </template>
 
