@@ -38,7 +38,9 @@ export default {
       this.messages.push({ from: 'user', text: this.userInput });
   
       try {
-        const response = await this.getBotResponse(this.userInput);
+        const userInputText = this.userInput;
+        this.userInput = '';
+        const response = await this.getBotResponse(userInputText);
         this.messages.push({ from: 'bot', text: response });
       } catch (error) {
         console.error("Error fetching bot response:", error);
