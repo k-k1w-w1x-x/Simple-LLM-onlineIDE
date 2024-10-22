@@ -41,6 +41,10 @@ export const useMonacoStore = defineStore("monaco", {
       const dom = document.querySelector(this.selector) as HTMLElement;
       // 3. 获取所有语言模型
       this.languages = languages.getLanguages();
+      
+      // 添加 Vue 语言支持
+      this.addVueLanguageSupport();
+      
       this.editor = editor.create(dom);
       // 4. 监听事件
       this.editor.onKeyDown(this.onKeyDownHandle);
@@ -70,6 +74,9 @@ export const useMonacoStore = defineStore("monaco", {
 
     /** 通过传入的 后缀 获取Monaco language */
     getLanguageModel(suffix: string) {
+      if (suffix === 'vue') {
+        return { id: 'vue' };
+      }
       return this.languages.find((item) =>
         item.extensions?.includes(`.${suffix}`)
       );
@@ -241,6 +248,103 @@ export const useMonacoStore = defineStore("monaco", {
       const path = this.getFilePath(this.currentFileID);
       // 2. 调用 container 的 saveFile 方法
       await this.containerStore.writeFile(path, contents);
+    },
+
+    // 新增方法：添加 Vue 语言支持
+    addVueLanguageSupport() {
+      languages.register({ id: 'vue' });
+      languages.setMonarchTokensProvider('vue', {
+        defaultToken: '',
+        tokenPostfix: '.vue',
+        ignoreCase: true,
+
+        tokenizer: {
+          root: [
+            [/^<template.*>$/, { token: 'meta.tag', next: '@template' }],
+            [/^<script\b.*>$/, { token: 'meta.tag', next: '@script', nextEmbedded: 'text/javascript' }],
+            [/^<style\b.*>$/, { token: 'meta.tag', next: '@style', nextEmbedded: 'text/css' }],
+            [/<!--/, 'comment', '@comment'],
+            [/</, 'tag', '@tag'],
+          ],
+
+          template: [
+            [/<\/template>/, { token: 'meta.tag', next: '@pop' }],
+            [/</, 'tag', '@tag'],
+            [/{{/, 'delimiter.curly', '@interpolation'],
+            [/./, 'text'],
+          ],
+
+          script: [
+            [/<\/script>/, { token: '@rematch', next: '@pop', nextEmbedded: '@pop' }],
+            [/./, 'text'],
+          ],
+
+          style: [
+            [/<\/style>/, { token: '@rematch', next: '@pop', nextEmbedded: '@pop' }],
+            [/./, 'text'],
+          ],
+
+          comment: [
+            [/-->/, 'comment', '@pop'],
+            [/./, 'comment']
+          ],
+
+          tag: [
+            [/>/, 'tag', '@pop'],
+            [/"/, 'attribute.value', '@string.double'],
+            [/'/, 'attribute.value', '@string.single'],
+            [/[\w\-]+/, 'attribute.name'],
+            [/=/, 'delimiter'],
+            [/[ \t\r\n]+/],
+          ],
+
+          string: [
+            [/[^"']+/, 'attribute.value'],
+            [/"/, 'attribute.value', '@pop'],
+            [/'/, 'attribute.value', '@pop'],
+          ],
+
+          interpolation: [
+            [/}}/, 'delimiter.curly', '@pop'],
+            [/./, 'text'],
+          ],
+        },
+      });
+
+      // 配置 Vue 文件的语言特性
+      languages.setLanguageConfiguration('vue', {
+        wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
+        comments: {
+          lineComment: '//',
+          blockComment: ['/*', '*/']
+        },
+        brackets: [
+          ['{', '}'],
+          ['[', ']'],
+          ['(', ')']
+        ],
+        autoClosingPairs: [
+          { open: '{', close: '}' },
+          { open: '[', close: ']' },
+          { open: '(', close: ')' },
+          { open: '"', close: '"' },
+          { open: "'", close: "'" }
+        ],
+        surroundingPairs: [
+          { open: '{', close: '}' },
+          { open: '[', close: ']' },
+          { open: '(', close: ')' },
+          { open: '"', close: '"' },
+          { open: "'", close: "'" },
+          { open: '<', close: '>' },
+        ],
+        folding: {
+          markers: {
+            start: new RegExp("^\\s*//\\s*#?region\\b"),
+            end: new RegExp("^\\s*//\\s*#?endregion\\b")
+          }
+        }
+      });
     },
   },
 });
