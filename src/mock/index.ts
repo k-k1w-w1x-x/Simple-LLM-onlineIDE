@@ -105,21 +105,21 @@ const fileMenuTreeData = [
     label: "index.html",
     suffix: "html",
     isFolder: false,
-    icon: "http://localhost:3000/src/assets/fileIcon/html.svg",
+    icon: "http://localhost:3001/assets/fileIcon/html.svg",
   },
   {
     id: "package.json",
     label: "package.json",
     suffix: "json",
     isFolder: false,
-    icon: "http://localhost:3000/src/assets/fileIcon/json.svg",
+    icon: "http://localhost:3001/assets/fileIcon/json.svg",
   },
   {
     id: "vite.config.js",
     label: "vite.config.js",
     suffix: "js",
     isFolder: false,
-    icon: "http://localhost:3000/src/assets/fileIcon/js.svg",
+    icon: "http://localhost:3001/assets/fileIcon/js.svg",
   },
 ];
 
