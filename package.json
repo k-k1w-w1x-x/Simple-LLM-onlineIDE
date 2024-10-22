@@ -1,13 +1,16 @@
 {
-  "name": "unicode-ide",
+  "name": "cscupcakecoder",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.0.1",
+  "type": "commonjs",
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
-    "build": "eslint . && vue-tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "start": "pnpm run build && pnpm run electron\"",
+    "electron-pack": "electron-builder"
   },
   "keywords": [
     "Monaco Editor",
@@ -24,6 +27,7 @@
     "ansi-to-html": "^0.7.2",
     "babel-runtime": "^6.26.0",
     "element-plus": "^2.7.4",
+    "express": "^4.21.1",
     "less": "^4.2.0",
     "less-loader": "4",
     "markdown-it": "^14.1.0",
@@ -36,6 +40,8 @@
   "devDependencies": {
     "@eslint/js": "^9.4.0",
     "@vitejs/plugin-vue": "^5.0.4",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
     "eslint": "9.x",
     "eslint-plugin-vue": "^9.26.0",
     "globals": "^15.3.0",
@@ -43,5 +49,26 @@
     "typescript-eslint": "^7.11.0",
     "vite": "^5.2.0",
     "vue-tsc": "^2.0.6"
+  },
+  "main": "main.js",
+  "build": {
+    "appId": "com.cscupcakecoder",
+    "productName": "CSCupcakeCoder",
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "main.js",
+      "preload.js",
+      "server.js",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
   }
 }

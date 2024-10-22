@@ -202,6 +202,7 @@ export const useMonacoStore = defineStore("monaco", {
       } else {
         // 2. 读取文件内容赋给monaco
         const path = this.getFilePath(id);
+        console.log(path);
         const contents = await this.containerStore.readFile(path);
         // 创建语言模型
         const model = this.createModel(

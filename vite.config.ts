@@ -3,6 +3,7 @@ import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: "./",
   plugins: [vue()],
   server: {
     open: true,
@@ -13,5 +14,8 @@ export default defineConfig({
       "Cross-Origin-Embedder-Policy": "require-corp",
       "Cross-Origin-Opener-Policy": "same-origin",
     },
+  },
+  build: {
+    outDir: 'dist',
   },
 });
